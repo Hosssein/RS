@@ -176,6 +176,7 @@ public:
 
                 lemur::api::COUNT_T tc = ind.termCount();
                 startIteration();
+                lemur::utility::HashFreqVector hfv(ind,dRep->getID());
                 while (hasMore())
                 {
 
@@ -185,7 +186,7 @@ public:
 
                     double delta =readedDelta;
 
-                    lemur::utility::HashFreqVector hfv(ind,dRep->getID());
+                    
 
                     int freq=0;
                     hfv.find(qt->id(),freq);
@@ -217,6 +218,9 @@ public:
             {
                 lemur::api::COUNT_T tc = ind.termCount();
                 startIteration();
+                lemur::utility::HashFreqVector hfv(ind,dRep->getID()), *hfv2;
+                if (newNonRel)
+                    hfv2 = new lemur::utility::HashFreqVector(ind,JudgDocs[JudgDocs.size()-1]);
                 while (hasMore())
                 {
 
@@ -225,12 +229,10 @@ public:
                     if (newNonRel)
                     {
                         int freq;
-                        lemur::utility::HashFreqVector hfv(ind,JudgDocs[JudgDocs.size()-1]);
-                        hfv.find(qt->id(),freq);
+                        hfv2.find(qt->id(),freq);
                         countInNonRel[qt->id()] += freq;
                     }
                     double cwdbar = 0;
-                    lemur::utility::HashFreqVector hfv(ind,dRep->getID());
                     int freq=0 ;//, DNsize = 0;???????????????????????????????????????????
                     hfv.find(qt->id(),freq);
                     if(freq>0)
@@ -256,7 +258,8 @@ public:
 
 
                 }
-
+                if (newNonRel)
+                    delete hfv2;
             }
             return negQueryGen;
                 //cout<<negQueryGen<<"dddddddddddd\n";
@@ -394,7 +397,7 @@ public:
     }
 
     virtual void updateTextQuery(lemur::api::TextQueryRep &origRep,
-                                 const lemur::api::DocIDSet &relDocs);
+                                 const lemur::api::DocIDSet &relDocs, const lemur::api::DocIDSet &nonRelDocs);
 
     virtual void updateProfile(lemur::api::TextQueryRep &origRep,
                                 vector<int> relJudglDoc ,vector<int> nonReljudgDoc);
@@ -449,7 +452,7 @@ protected:
                                    const lemur::api::DocIDSet &relDocs) ;
     /// Relevance model1 feedback method
     void computeRM1FBModel(QueryModel &origRep,
-                           const lemur::api::DocIDSet & relDocs);
+                           const lemur::api::DocIDSet & relDocs,const lemur::api::DocIDSet & nonRelDocs);
     /// Relevance model1 feedback method
     void computeRM2FBModel(QueryModel &origRep,
                            const lemur::api::DocIDSet & relDocs);

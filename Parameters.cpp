@@ -24,10 +24,10 @@ int WHO;// 0--> server , 1-->Mozhdeh, 2-->AP, other-->Hossein
 string outputFileNameHM;
 string resultFileNameHM;
 
-void readParams()
+void readParams(string paramFileName)
 {
     cout<<"********************\n";
-    ifstream in("parameters.txt");
+    ifstream in(paramFileName.c_str());
     if(in.is_open())
     {
         string temp;

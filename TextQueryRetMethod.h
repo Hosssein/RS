@@ -112,13 +112,13 @@ namespace lemur
       virtual ScoreFunction *scoreFunc() = 0;
       /// update the query
       virtual void updateQuery(QueryRep &qryRep, const DocIDSet &relDocs) {
-        updateTextQuery(*((TextQueryRep *)(&qryRep)), relDocs);
-
+        cout<<"NaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa"<<endl;
+        updateTextQuery(*((TextQueryRep *)(&qryRep)), relDocs,relDocs);
       }
 
       /// Modify/update the query representation based on a set (presumably) relevant documents
       virtual void updateTextQuery(TextQueryRep &qryRep, 
-                                   const DocIDSet &relDocs )=0;
+                                   const DocIDSet &relDocs, const DocIDSet &nonRelDocs)=0;
 
 
       /// Efficient scoring with the inverted index

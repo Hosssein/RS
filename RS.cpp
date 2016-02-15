@@ -49,10 +49,10 @@ map<string , vector<string> >queryRelDocsMap;
 string judgmentPath,indexPath,queryPath;
 string resultPath = "res.my_rs_neg2_method";
 
-int main()
+int main(int argc, char * argv[])
 {
-    readParams();
-
+    readParams(string(argv[1]));
+	cout<< "reading param file: "<<argv[1]<<endl;
     switch (WHO)
     {
     case 0:
@@ -63,7 +63,7 @@ int main()
     case 1:
         judgmentPath = "/home/mozhdeh/Desktop/INFILE/hosein-data/qrels_en";
         indexPath = "/home/mozhdeh/Desktop/INFILE/javid-index/index.key";
-        queryPath = "/home/mozhdeh/Desktop/INFILE/hosein-data/q_en_titleKeyword_en.stemmed (copy).xml";
+        queryPath = "/home/mozhdeh/Desktop/INFILE/hosein-data/q_en_titleKeyword_en.stemmed.xml";
         break;
     //case 2:
     //    judgmentPath ="/home/mozhdeh/Desktop/AP/Data/jud-ap.txt";
@@ -174,8 +174,10 @@ void computeRSMethods(Index* ind)
                         newNonRel = true;
                     }
                     results.PushValue(docID , sim);
-
-                    myMethod->updateProfile(*((TextQueryRep *)(qr)),relJudgDocs , nonRelJudgDocs );
+                    if (results.size() %20 == 0){
+                        cout<<"Updating profile. Result size: "<<results.size()<<endl;
+                        myMethod->updateProfile(*((TextQueryRep *)(qr)),relJudgDocs , nonRelJudgDocs );
+                    }
                     myMethod->updateThreshold(*((TextQueryRep *)(qr)), relJudgDocs , nonRelJudgDocs );
 
                 }
