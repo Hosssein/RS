@@ -206,13 +206,13 @@ lemur::retrieval::RetMethod::RetMethod(const Index &dbIndex,
     //qryParam.adjScoreMethod = RetParameter::QUERYLIKELIHOOD;
     //qryParam.fbMethod = RetParameter::defaultFBMethod;
     //qryParam.fbMethod = RetParameter::DIVMIN;
-    qryParam.fbMethod = RetParameter::RM2;
+    qryParam.fbMethod = RetParameter::RM1;
     RM="RM1";// *** Query Likelihood adjusted score method *** //
     //qryParam.fbCoeff = RetParameter::defaultFBCoeff;
     qryParam.fbCoeff =0.5;
     qryParam.fbPrTh = RetParameter::defaultFBPrTh;
     qryParam.fbPrSumTh = RetParameter::defaultFBPrSumTh;
-    qryParam.fbTermCount = 50;//RetParameter::defaultFBTermCount;
+    qryParam.fbTermCount = 5;//RetParameter::defaultFBTermCount;
     qryParam.fbMixtureNoise = RetParameter::defaultFBMixNoise;
     qryParam.emIterations = RetParameter::defaultEMIterations;
 
@@ -346,13 +346,25 @@ DocumentRep *lemur::retrieval::RetMethod::computeDocRep(DOCID_T docID)
 
 
 void lemur::retrieval::RetMethod::updateProfile(lemur::api::TextQueryRep &origRep,
-                                                vector<int> relJudglDoc ,vector<int> nonReljudgDoc)
+                                                vector<int> relJudgDoc ,vector<int> nonRelJudgDoc)
 {
     //cerr<<"hahahaha"<<endl;
-    return;
+    IndexedRealVector rel , nonRel;
+    for (int i =0 ; i<relJudgDoc.size() ; i++){
+        rel.PushValue(relJudgDoc[i],0);
+    }
+    for (int i =0 ; i<nonRelJudgDoc.size() ; i++){
+        nonRel.PushValue(nonRelJudgDoc[i],0);
+    }
+    PseudoFBDocs *relDocs , *nonRelDocs;
+    relDocs= new PseudoFBDocs(rel,-1,true);
+    nonRelDocs= new PseudoFBDocs(nonRel,-1,true);
+    updateTextQuery(origRep,*relDocs,*nonRelDocs);
+    delete relDocs;
+    delete nonRelDocs;
 }
 void lemur::retrieval::RetMethod::updateThreshold(lemur::api::TextQueryRep &origRep,
-                                                  vector<int> relJudglDoc ,vector<int> nonReljudgDoc)
+                                                  vector<int> relJudgDoc ,vector<int> nonReljudgDoc)
 {
     //threshold = -4.5;
     return;
@@ -420,15 +432,15 @@ float lemur::retrieval::RetMethod::computeProfDocSim(lemur::api::TextQueryRep *t
 
 
 void lemur::retrieval::RetMethod::updateTextQuery(TextQueryRep &origRep, 
-                                                  const DocIDSet &relDocs )
+                                                  const DocIDSet &relDocs,const DocIDSet &nonRelDocs )
 {
-    cerr<<"fffffffffff"<<endl;
+    //cerr<<"fffffffffff"<<endl;
     QueryModel *qr;
 
     qr = dynamic_cast<QueryModel *> (&origRep);
 
     if(RM=="RM1"){
-        computeRM1FBModel(*qr, relDocs);
+        computeRM1FBModel(*qr, relDocs,nonRelDocs);
         return;
     }else if(RM=="RM2"){
         computeRM2FBModel(*qr, relDocs);
@@ -464,7 +476,7 @@ void lemur::retrieval::RetMethod::updateTextQuery(TextQueryRep &origRep,
         computeMarkovChainFBModel(*qr, relDocs);
         break;
     case RetParameter::RM1:
-        computeRM1FBModel(*qr, relDocs);
+        computeRM1FBModel(*qr, relDocs,nonRelDocs);
         break;
     case RetParameter::RM2:
         computeRM2FBModel(*qr, relDocs);
@@ -679,19 +691,23 @@ void lemur::retrieval::RetMethod::computeMarkovChainFBModel(QueryModel &origRep,
 }
 
 void lemur::retrieval::RetMethod::computeRM1FBModel(QueryModel &origRep, 
-                                                    const DocIDSet &relDocs)
+                                                    const DocIDSet &relDocs,const DocIDSet &nonRelDocs)
 {  
     COUNT_T numTerms = ind.termCountUnique();
 
     // RelDocUnigramCounter computes SUM(D){P(w|D)*P(D|Q)} for each w
     lemur::langmod::RelDocUnigramCounter *dCounter = new lemur::langmod::RelDocUnigramCounter(relDocs, ind);
+    lemur::langmod::RelDocUnigramCounter *nCounter = new lemur::langmod::RelDocUnigramCounter(nonRelDocs, ind);
 
     double *distQuery = new double[numTerms+1];
+    double *negDistQuery = new double[numTerms+1];
     double expWeight = qryParam.fbCoeff;
-
+    double negWeight = 0.5;
     TERMID_T i;
-    for (i=1; i<=numTerms;i++)
+    for (i=1; i<=numTerms;i++){
         distQuery[i] = 0.0;
+        negDistQuery[i] = 0.0;
+    }
 
     double pSum=0.0;
     dCounter->startIteration();
@@ -702,10 +718,22 @@ void lemur::retrieval::RetMethod::computeRM1FBModel(QueryModel &origRep,
         distQuery[wd]=wdPr;
         pSum += wdPr;
     }
+    double nSum=0.0;
+    nCounter->startIteration();
+    while (nCounter->hasMore()) {
+        int wd; // dmf FIXME
+        double wdPr;
+        nCounter->nextCount(wd, wdPr);
+        negDistQuery[wd]=wdPr;
+        nSum += wdPr;
+    }
 
     for (i=1; i<=numTerms;i++) {
-        distQuery[i] = expWeight*distQuery[i]/pSum +
+        //REMOVE  2 * 
+        distQuery[i] =  2 *expWeight*(negWeight*(distQuery[i]/pSum)-(1-negWeight)*(negDistQuery[i]/nSum) )+
                 (1-expWeight)*ind.termCount(i)/ind.termCount();
+        //distQuery[i] = expWeight*distQuery[i]/pSum +
+          //      (1-expWeight)*ind.termCount(i)/ind.termCount();
     }
 
     lemur::utility::ArrayCounter<double> lmCounter(numTerms+1);
@@ -719,7 +747,9 @@ void lemur::retrieval::RetMethod::computeRM1FBModel(QueryModel &origRep,
                             qryParam.fbPrSumTh, 0.0);
     delete fblm;
     delete dCounter;
+    delete nCounter;
     delete[] distQuery;
+    delete[] negDistQuery;
 }
 void lemur::retrieval::RetMethod::computeRM3FBModel(QueryModel &origRep, 
                                                     const DocIDSet &relDocs)
