@@ -206,6 +206,10 @@ lemur::retrieval::RetMethod::RetMethod(const Index &dbIndex,
     //qryParam.adjScoreMethod = RetParameter::QUERYLIKELIHOOD;
     //qryParam.fbMethod = RetParameter::defaultFBMethod;
     //qryParam.fbMethod = RetParameter::DIVMIN;
+
+
+
+    
     qryParam.fbMethod = RetParameter::RM1;
     RM="RM1";// *** Query Likelihood adjusted score method *** //
     //qryParam.fbCoeff = RetParameter::defaultFBCoeff;
@@ -380,6 +384,7 @@ float lemur::retrieval::RetMethod::computeProfDocSim(lemur::api::TextQueryRep *t
     DocumentRep *dRep;
     HashFreqVector hfv(ind,docID);
 
+    dRep = computeDocRep(docID);
     textQR->startIteration();
     while (textQR->hasMore())
     {
@@ -394,7 +399,7 @@ float lemur::retrieval::RetMethod::computeProfDocSim(lemur::api::TextQueryRep *t
         int tf;
         hfv.find(qTerm->id(),tf);
         DocInfo *info = new DocInfo(docID,tf);
-        dRep = computeDocRep(docID);
+        
 
         sc += scoreFunc()->matchedTermWeight(qTerm, textQR, info, dRep);
         delete info;

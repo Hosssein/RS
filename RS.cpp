@@ -63,7 +63,7 @@ int main(int argc, char * argv[])
     case 1:
         judgmentPath = "/home/mozhdeh/Desktop/INFILE/hosein-data/qrels_en";
         indexPath = "/home/mozhdeh/Desktop/INFILE/javid-index/index.key";
-        queryPath = "/home/mozhdeh/Desktop/INFILE/hosein-data/q_en_titleKeyword_en.stemmed.xml";
+        queryPath = "/home/mozhdeh/Desktop/INFILE/hosein-data/q_en_titleKeyword_en.stemmed (copy).xml";
         break;
     //case 2:
     //    judgmentPath ="/home/mozhdeh/Desktop/AP/Data/jud-ap.txt";
@@ -119,6 +119,8 @@ void computeRSMethods(Index* ind)
         double relRetCounter = 0 , retCounter = 0 , relCounter = 0;
         while(qs->hasMore())
         {
+              std::cout << "Hello, World\n";
+                std::cin.ignore();
             vector<int> relJudgDocs,nonRelJudgDocs;
             results.clear();
             Document* d = qs->nextDoc();
@@ -178,7 +180,7 @@ void computeRSMethods(Index* ind)
                         cout<<"Updating profile. Result size: "<<results.size()<<endl;
                         myMethod->updateProfile(*((TextQueryRep *)(qr)),relJudgDocs , nonRelJudgDocs );
                     }
-                    myMethod->updateThreshold(*((TextQueryRep *)(qr)), relJudgDocs , nonRelJudgDocs );
+                    //myMethod->updateThreshold(*((TextQueryRep *)(qr)), relJudgDocs , nonRelJudgDocs );
 
                 }
                 else
@@ -194,6 +196,8 @@ void computeRSMethods(Index* ind)
             relCounter += relDocs.size();
 
             //break;
+            delete q;
+            delete qr;
         }
         cout<<"relret: "<<relRetCounter<<" rel: "<<relCounter<<" ret: "<<retCounter<<endl;
         double precision = relRetCounter/retCounter, recall = relRetCounter/relCounter, f = (2*precision*recall)/(precision+recall);
@@ -203,6 +207,8 @@ void computeRSMethods(Index* ind)
 
         //break;
     }
+    delete qs;
+    delete myMethod;
 }
 void loadJudgment()
 {

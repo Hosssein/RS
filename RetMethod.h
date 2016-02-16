@@ -171,8 +171,8 @@ public:
             //cout<<readedDelta<<"\n";
             double mu=negGenMUHM;//2500;
             negQueryGen =0;
-            if(negQueryGen == 0)
-            {
+         //   if(negQueryGen == 0)
+           // {
 
                 lemur::api::COUNT_T tc = ind.termCount();
                 startIteration();
@@ -185,8 +185,6 @@ public:
                     //cout<<qt->id()<<" "<<pwq<<endl;
 
                     double delta =readedDelta;
-
-                    
 
                     int freq=0;
                     hfv.find(qt->id(),freq);
@@ -204,7 +202,7 @@ public:
                 }
 
                 //cout<<negQueryGen<<"dddddddddddd\n";
-            }
+           // }
             return negQueryGen;
 
         }else if (whichMethod == 1)// using DN instead of collection
@@ -214,8 +212,8 @@ public:
 
             double mu=negGenMUHM;//2500;
             negQueryGen =0;
-            if(negQueryGen == 0)
-            {
+            //if(negQueryGen == 0)
+            //{
                 lemur::api::COUNT_T tc = ind.termCount();
                 startIteration();
                 lemur::utility::HashFreqVector hfv(ind,dRep->getID()), *hfv2;
@@ -229,11 +227,11 @@ public:
                     if (newNonRel)
                     {
                         int freq;
-                        hfv2.find(qt->id(),freq);
+                        hfv2->find(qt->id(),freq);
                         countInNonRel[qt->id()] += freq;
                     }
                     double cwdbar = 0;
-                    int freq=0 ;//, DNsize = 0;???????????????????????????????????????????
+                    int freq=0 ;
                     hfv.find(qt->id(),freq);
                     if(freq>0)
                         cwdbar = 0;
@@ -260,7 +258,7 @@ public:
                 }
                 if (newNonRel)
                     delete hfv2;
-            }
+            //}
             return negQueryGen;
                 //cout<<negQueryGen<<"dddddddddddd\n";
         }
