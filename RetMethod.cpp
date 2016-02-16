@@ -30,7 +30,7 @@ using namespace lemur::utility;
 
 extern int RSMethodHM; // 0--> LM , 1--> RecSys
 extern int negGenModeHM;//0 --> coll , 1--> nonRel
-
+extern int feedbackMode;
 
 
 //extern map<int, map<int,double> > FEEDBACKMAP;
@@ -197,7 +197,7 @@ lemur::retrieval::RetMethod::RetMethod(const Index &dbIndex,
     //docParam.smthMethod = RetParameter::JELINEKMERCER;
 
     docParam.smthStrategy= RetParameter::defaultSmoothStrategy;
-    docParam.ADDelta = RetParameter::defaultADDelta;
+    //docParam.ADDelta = RetParameter::defaultADDelta;
     docParam.JMLambda = RetParameter::defaultJMLambda;
     //docParam.JMLambda = 0.9;
     docParam.DirPrior = 50;//RetParameter::defaultDirPrior;
@@ -226,6 +226,23 @@ lemur::retrieval::RetMethod::RetMethod(const Index &dbIndex,
 
     collectLMCounter = new lemur::langmod::DocUnigramCounter(ind);
     collectLM = new lemur::langmod::MLUnigramLM(*collectLMCounter, ind.termLexiconID());
+
+    switch (RSMethodHM)
+    {
+    case 0://lm
+        setThreshold(-4.3);
+
+        break;
+    case 1://negGen
+    {
+        if(negGenModeHM==0)//col//mu=2500
+            setThreshold(2.1);
+        else if(negGenModeHM == 1)
+            setThreshold(2.4);
+        break;
+    }
+    }
+
 
     scFunc = new ScoreFunc();
     scFunc->setScoreMethod(qryParam.adjScoreMethod);
@@ -354,10 +371,12 @@ void lemur::retrieval::RetMethod::updateProfile(lemur::api::TextQueryRep &origRe
 {
     //cerr<<"hahahaha"<<endl;
     IndexedRealVector rel , nonRel;
-    for (int i =0 ; i<relJudgDoc.size() ; i++){
+    for (int i =0 ; i<relJudgDoc.size() ; i++)
+    {
         rel.PushValue(relJudgDoc[i],0);
     }
-    for (int i =0 ; i<nonRelJudgDoc.size() ; i++){
+    for (int i =0 ; i<nonRelJudgDoc.size() ; i++)
+    {
         nonRel.PushValue(nonRelJudgDoc[i],0);
     }
     PseudoFBDocs *relDocs , *nonRelDocs;
@@ -407,10 +426,10 @@ float lemur::retrieval::RetMethod::computeProfDocSim(lemur::api::TextQueryRep *t
     }
 
     //if(i == ind.document("afp.com-20051012T084831Z-TX-SGE-QIM16.xml") )
-      //  cerr<<"lemur before adj: "<<sc<<endl;
-   // if(ind.document("afp.com-20051012T084831Z-TX-SGE-QIM16.xml" ) == dRep->getID() )
+    //  cerr<<"lemur before adj: "<<sc<<endl;
+    // if(ind.document("afp.com-20051012T084831Z-TX-SGE-QIM16.xml" ) == dRep->getID() )
     //if (dRep->getID() == 73)
-     //   cerr<<"mine : before adj "<<sc<<endl;
+    //   cerr<<"mine : before adj "<<sc<<endl;
 
     /*
     int mode;
@@ -707,7 +726,9 @@ void lemur::retrieval::RetMethod::computeRM1FBModel(QueryModel &origRep,
     double *distQuery = new double[numTerms+1];
     double *negDistQuery = new double[numTerms+1];
     double expWeight = qryParam.fbCoeff;
-    double negWeight = 0.5;
+
+    //double negWeight = 0.5;
+
     TERMID_T i;
     for (i=1; i<=numTerms;i++){
         distQuery[i] = 0.0;
@@ -733,12 +754,20 @@ void lemur::retrieval::RetMethod::computeRM1FBModel(QueryModel &origRep,
         nSum += wdPr;
     }
 
+
     for (i=1; i<=numTerms;i++) {
-        //REMOVE  2 * 
-        distQuery[i] =  2 *expWeight*(negWeight*(distQuery[i]/pSum)-(1-negWeight)*(negDistQuery[i]/nSum) )+
-                (1-expWeight)*ind.termCount(i)/ind.termCount();
-        //distQuery[i] = expWeight*distQuery[i]/pSum +
-          //      (1-expWeight)*ind.termCount(i)/ind.termCount();
+        //REMOVE  2 *
+        if(feedbackMode == 2)
+        {
+            distQuery[i] = expWeight*distQuery[i]/pSum +
+                    (1-expWeight)*ind.termCount(i)/ind.termCount();
+
+        }else if(feedbackMode == 1)
+        {
+            distQuery[i] =  expWeight*(getNegWeight()*(distQuery[i]/pSum)-(1-getNegWeight())*(negDistQuery[i]/nSum) )+
+                    (1-expWeight)*ind.termCount(i)/ind.termCount();
+        }
+
     }
 
     lemur::utility::ArrayCounter<double> lmCounter(numTerms+1);

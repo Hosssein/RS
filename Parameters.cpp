@@ -15,10 +15,11 @@ string numToStrHM(T number)
 }
 
 double startThresholdHM , endThresholdHM , intervalThresholdHM ,negGenMUHM;
-
+double startNegWeight ,endNegWeight;
 int RSMethodHM; // 0--> LM , 1--> RecSys
 int negGenModeHM;//0 --> coll , 1--> nonRel
 
+int feedbackMode;
 
 int WHO;// 0--> server , 1-->Mozhdeh, 2-->AP, other-->Hossein
 string outputFileNameHM;
@@ -32,13 +33,15 @@ void readParams(string paramFileName)
     {
         string temp;
         in>>temp;
-        in>>WHO>>RSMethodHM>>negGenModeHM>>negGenMUHM>>startThresholdHM>>endThresholdHM>>intervalThresholdHM;
-        cout<<WHO<<" "<<RSMethodHM<<" "<<negGenModeHM<<" "<<negGenMUHM<<" "<<startThresholdHM<<" "<<endThresholdHM<<" "<<intervalThresholdHM<<endl;
+        in>>WHO>>RSMethodHM>>negGenModeHM>>negGenMUHM>>startThresholdHM
+         >>endThresholdHM>>intervalThresholdHM>>feedbackMode>>startNegWeight>>endNegWeight;
+        //cout<<WHO<<" "<<RSMethodHM<<" "<<negGenModeHM<<" "<<negGenMUHM<<" "<<startThresholdHM<<" "<<endThresholdHM<<" "<<intervalThresholdHM<<endl;
     }
     if(RSMethodHM==1)
     {
         if(negGenModeHM == 0)
         {
+
             outputFileNameHM = "out/RecSys_NegGenColl_";
             resultFileNameHM ="res/RecSys_NegGenColl_";
         }else if(negGenModeHM == 1)
@@ -53,6 +56,21 @@ void readParams(string paramFileName)
         outputFileNameHM += "out/LM_";
         resultFileNameHM += "res/LM_";
     }
+
+    if(feedbackMode == 0)//no fb
+    {
+        outputFileNameHM+="Nofb_";
+        resultFileNameHM += "Nofb_";
+    }else if(feedbackMode == 1)//ours
+    {
+        outputFileNameHM+="negFB_"+numToStrHM(startNegWeight)+":"+numToStrHM(endNegWeight)+"_";
+        resultFileNameHM += "negFB_";
+    }else if(feedbackMode == 2)//normal feedback
+    {
+        outputFileNameHM+="normalFB_";
+        resultFileNameHM += "normalFB_";
+    }
+
     outputFileNameHM += numToStrHM(startThresholdHM)+":"+numToStrHM(endThresholdHM);
 
 }

@@ -43,7 +43,8 @@ extern double startThresholdHM , endThresholdHM , intervalThresholdHM ;
 extern int WHO;// 0--> server , 1-->Mozhdeh, 2-->AP, other-->Hossein
 extern string outputFileNameHM;
 extern string resultFileNameHM;
-
+extern int feedbackMode;
+extern double startNegWeight,endNegWeight;
 
 map<string , vector<string> >queryRelDocsMap;
 string judgmentPath,indexPath,queryPath;
@@ -96,20 +97,25 @@ void computeRSMethods(Index* ind)
     ArrayAccumulator accumulator(ind->docCount());
     RetMethod *myMethod = new RetMethod(*ind,"",accumulator);
     double start_thresh =startThresholdHM, end_thresh= endThresholdHM;
-    //double start_thresh =-5, end_thresh= -2;
+    double start_negThr = startNegWeight , end_negThr = endNegWeight;
 
     ofstream out(outputFileNameHM.c_str());
-    for (double thresh = start_thresh ; thresh<=end_thresh ; thresh += intervalThresholdHM)
+   // for (double thresh = start_thresh ; thresh<=end_thresh ; thresh += intervalThresholdHM)
+     for (double neg = start_negThr ; neg<=end_negThr ; neg += 0.1)
     {
-        //double thresh = -4;
-        myMethod->setThreshold(thresh);
+
+        //myMethod->setThreshold(thresh);
+        myMethod->setNegWeight(neg);
+
 
         IndexedRealVector results;
 
-        out<<"threshold: "<<thresh<<endl;
+        //out<<"threshold: "<<myMethod->getThreshold()<<endl;
+        out<<"negWeight: "<<myMethod->getNegWeight()<<endl;
+
         qs->startDocIteration();
         TextQuery *q;
-        resultPath = resultFileNameHM.c_str() +numToStr(thresh)+".res";
+        resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(neg)+".res";
         ofstream result(resultPath.c_str());
         ResultFile resultFile(1);
         resultFile.openForWrite(result,*ind);
@@ -119,8 +125,6 @@ void computeRSMethods(Index* ind)
         double relRetCounter = 0 , retCounter = 0 , relCounter = 0;
         while(qs->hasMore())
         {
-              std::cout << "Hello, World\n";
-                std::cin.ignore();
             vector<int> relJudgDocs,nonRelJudgDocs;
             results.clear();
             Document* d = qs->nextDoc();
@@ -176,8 +180,10 @@ void computeRSMethods(Index* ind)
                         newNonRel = true;
                     }
                     results.PushValue(docID , sim);
-                    if (results.size() %20 == 0){
+                    if (results.size() %20 == 0 && feedbackMode > 0)
+                    {
                         cout<<"Updating profile. Result size: "<<results.size()<<endl;
+
                         myMethod->updateProfile(*((TextQueryRep *)(qr)),relJudgDocs , nonRelJudgDocs );
                     }
                     //myMethod->updateThreshold(*((TextQueryRep *)(qr)), relJudgDocs , nonRelJudgDocs );
@@ -206,6 +212,8 @@ void computeRSMethods(Index* ind)
         out<<"F measure: "<<f<<endl;
 
         //break;
+        if(feedbackMode == 0)
+            break;
     }
     delete qs;
     delete myMethod;
