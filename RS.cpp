@@ -49,11 +49,13 @@ extern double startNegWeight,endNegWeight;
 map<string , vector<string> >queryRelDocsMap;
 string judgmentPath,indexPath,queryPath;
 string resultPath = "res.my_rs_neg2_method";
+int numberOfProcessedQueries = 0 , numberOfQueries=0;
+
 
 int main(int argc, char * argv[])
 {
     readParams(string(argv[1]));
-	cout<< "reading param file: "<<argv[1]<<endl;
+    cout<< "reading param file: "<<argv[1]<<endl;
     switch (WHO)
     {
     case 0:
@@ -66,11 +68,11 @@ int main(int argc, char * argv[])
         indexPath = "/home/mozhdeh/Desktop/INFILE/javid-index/index.key";
         queryPath = "/home/mozhdeh/Desktop/INFILE/hosein-data/q_en_titleKeyword_en.stemmed (copy).xml";
         break;
-    //case 2:
-    //    judgmentPath ="/home/mozhdeh/Desktop/AP/Data/jud-ap.txt";
-    //    indexPath = "/home/mozhdeh/Desktop/AP/index/index.key";
-     //   queryPath = "/home/mozhdeh/Desktop/AP/Data/topics.stemmed.xml";
-     //   break;
+        //case 2:
+        //    judgmentPath ="/home/mozhdeh/Desktop/AP/Data/jud-ap.txt";
+        //    indexPath = "/home/mozhdeh/Desktop/AP/index/index.key";
+        //   queryPath = "/home/mozhdeh/Desktop/AP/Data/topics.stemmed.xml";
+        //   break;
     default:
         judgmentPath = "/home/hossein/Desktop/lemur/DataSets/Infile/Data/qrels_en";
         indexPath = "/home/hossein/Desktop/lemur/DataSets/Infile/Index/en/index.key";
@@ -100,8 +102,8 @@ void computeRSMethods(Index* ind)
     double start_negThr = startNegWeight , end_negThr = endNegWeight;
 
     ofstream out(outputFileNameHM.c_str());
-   // for (double thresh = start_thresh ; thresh<=end_thresh ; thresh += intervalThresholdHM)
-     for (double neg = start_negThr ; neg<=end_negThr ; neg += 0.1)
+    // for (double thresh = start_thresh ; thresh<=end_thresh ; thresh += intervalThresholdHM)
+    for (double neg = start_negThr ; neg<=end_negThr ; neg += 0.1)
     {
 
         //myMethod->setThreshold(thresh);
@@ -123,6 +125,8 @@ void computeRSMethods(Index* ind)
         
 
         double relRetCounter = 0 , retCounter = 0 , relCounter = 0;
+        int numberOfQueries = 0;
+        vector<double> queriesPrecision,queriesRecall;
         while(qs->hasMore())
         {
             vector<int> relJudgDocs,nonRelJudgDocs;
@@ -139,11 +143,17 @@ void computeRSMethods(Index* ind)
             if( queryRelDocsMap.find(q->id()) != queryRelDocsMap.end() )//find it!
                 relDocs = queryRelDocsMap[q->id()];
             else
+            {
                 cerr<<"*******relSize**********\n";
+                continue;
+            }
+            numberOfQueries++;
+
 
             //for(int docID = 1 ; docID < ind->docCount() ; docID++){ //compute for all doc
 
             vector <int> docids = queryDocList(ind,((TextQueryRep *)(qr)));
+
 
             for(int i = 0 ; i<docids.size(); i++) //compute for docs wich have queryTerm
             {
@@ -194,26 +204,52 @@ void computeRSMethods(Index* ind)
                     newNonRel = false;
                 }
 
-            }
+            }//endfor docs
+
             results.Sort();
             resultFile.writeResults(q->id() ,&results,results.size());
             relRetCounter += relJudgDocs.size();
             retCounter += results.size();
             relCounter += relDocs.size();
 
+            if(results.size() != 0)
+            {
+                queriesPrecision.push_back((double)relJudgDocs.size() / results.size());
+                queriesRecall.push_back((double)relJudgDocs.size() / relDocs.size() );
+            }else // have no suggestion for this query
+            {
+                queriesPrecision.push_back(0.0);
+                queriesRecall.push_back(0.0);
+            }
+
+
             //break;
             delete q;
             delete qr;
-        }
+        }//end queries
+
         cout<<"relret: "<<relRetCounter<<" rel: "<<relCounter<<" ret: "<<retCounter<<endl;
         double precision = relRetCounter/retCounter, recall = relRetCounter/relCounter, f = (2*precision*recall)/(precision+recall);
         out<<"precision: "<<precision<<endl;
         out<<"recall: "<<recall<<endl;
         out<<"F measure: "<<f<<endl;
 
+        double avgPrec = 0.0 , avgRecall = 0.0;
+        for(int i = 0 ; i < queriesPrecision.size() ; i++)
+        {
+            avgPrec+=queriesPrecision[i];
+            avgRecall+= queriesRecall[i];
+        }
+        avgPrec/=queriesPrecision.size();
+        avgRecall/=queriesRecall.size();
+        out<<"Avg Precision: "<<avgPrec<<endl;
+        out<<"Avg Recall: "<<avgRecall<<endl;
+        out<<"F-measure: "<<(2*avgPrec*avgRecall)/(avgPrec+avgRecall)<<endl<<endl;
+
         //break;
         if(feedbackMode == 0)
             break;
+
     }
     delete qs;
     delete myMethod;
