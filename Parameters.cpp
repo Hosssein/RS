@@ -19,7 +19,7 @@ double startNegWeight ,endNegWeight;
 int RSMethodHM; // 0--> LM , 1--> RecSys
 int negGenModeHM;//0 --> coll , 1--> nonRel
 
-int feedbackMode;
+int feedbackMode;//0 --> no fb, 1-->ours , 2-->normal
 
 int WHO;// 0--> server , 1-->Mozhdeh, 2-->AP, other-->Hossein
 string outputFileNameHM;

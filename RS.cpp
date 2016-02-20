@@ -48,7 +48,7 @@ extern double startNegWeight,endNegWeight;
 
 map<string , vector<string> >queryRelDocsMap;
 string judgmentPath,indexPath,queryPath;
-string resultPath = "res.my_rs_neg2_method";
+string resultPath = "";
 int numberOfProcessedQueries = 0 , numberOfQueries=0;
 
 
@@ -76,7 +76,7 @@ int main(int argc, char * argv[])
     default:
         judgmentPath = "/home/hossein/Desktop/lemur/DataSets/Infile/Data/qrels_en";
         indexPath = "/home/hossein/Desktop/lemur/DataSets/Infile/Index/en/index.key";
-        queryPath = "/home/hossein/Desktop/lemur/DataSets/Infile/Data/q_en_titleKeyword_en.stemmed.xml";//????????
+        queryPath = "/home/hossein/Desktop/lemur/DataSets/Infile/Data/five_q_en_titleKeyword_en.stemmed.xml";//????????
         break;
     }
 
@@ -102,22 +102,24 @@ void computeRSMethods(Index* ind)
     double start_negThr = startNegWeight , end_negThr = endNegWeight;
 
     ofstream out(outputFileNameHM.c_str());
-    // for (double thresh = start_thresh ; thresh<=end_thresh ; thresh += intervalThresholdHM)
-    for (double neg = start_negThr ; neg<=end_negThr ; neg += 0.1)
+    for (double thresh = start_thresh ; thresh<=end_thresh ; thresh += intervalThresholdHM)
+    //for (double neg = start_negThr ; neg<=end_negThr ; neg += 0.1)
     {
-
-        //myMethod->setThreshold(thresh);
-        myMethod->setNegWeight(neg);
+        myMethod->setThreshold(thresh);
+        //myMethod->setNegWeight(neg);
 
 
         IndexedRealVector results;
 
-        //out<<"threshold: "<<myMethod->getThreshold()<<endl;
-        out<<"negWeight: "<<myMethod->getNegWeight()<<endl;
+        out<<"threshold: "<<myMethod->getThreshold()<<endl;
+        //out<<"negWeight: "<<myMethod->getNegWeight()<<endl;
 
         qs->startDocIteration();
         TextQuery *q;
-        resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(neg)+".res";
+
+        resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+".res";
+        //resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(neg)+".res";
+
         ofstream result(resultPath.c_str());
         ResultFile resultFile(1);
         resultFile.openForWrite(result,*ind);
@@ -247,10 +249,10 @@ void computeRSMethods(Index* ind)
         out<<"F-measure: "<<(2*avgPrec*avgRecall)/(avgPrec+avgRecall)<<endl<<endl;
 
         //break;
-        if(feedbackMode == 0)
-            break;
+        //if(feedbackMode == 0)//no fb
+        //    break;
 
-    }
+    }//end for_thr
     delete qs;
     delete myMethod;
 }
