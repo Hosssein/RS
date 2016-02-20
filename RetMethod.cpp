@@ -442,7 +442,7 @@ float lemur::retrieval::RetMethod::computeProfDocSim(lemur::api::TextQueryRep *t
     }*/
 
     double negQueryGenerationScore=0.0;
-    if(RSMethodHM == 1)
+    if(RSMethodHM == 1)//RecSys(neg,coll)
     {
         negQueryGenerationScore= qm->negativeQueryGeneration(dRep ,nonReljudgDoc ,negGenModeHM, newNonRel);
     }
@@ -757,12 +757,12 @@ void lemur::retrieval::RetMethod::computeRM1FBModel(QueryModel &origRep,
 
     for (i=1; i<=numTerms;i++) {
         //REMOVE  2 *
-        if(feedbackMode == 2)
+        if(feedbackMode == 2)//normal
         {
             distQuery[i] = expWeight*distQuery[i]/pSum +
                     (1-expWeight)*ind.termCount(i)/ind.termCount();
 
-        }else if(feedbackMode == 1)
+        }else if(feedbackMode == 1)//ours
         {
             distQuery[i] =  expWeight*(getNegWeight()*(distQuery[i]/pSum)-(1-getNegWeight())*(negDistQuery[i]/nSum) )+
                     (1-expWeight)*ind.termCount(i)/ind.termCount();
