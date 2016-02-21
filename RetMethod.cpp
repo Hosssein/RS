@@ -230,15 +230,18 @@ lemur::retrieval::RetMethod::RetMethod(const Index &dbIndex,
     switch (RSMethodHM)
     {
     case 0://lm
-        setThreshold(-4.3);
+       // setThreshold(-4.3);
+	setThreshold(-6.3);
 
         break;
     case 1://negGen
     {
         if(negGenModeHM==0)//col//mu=2500
-            setThreshold(2.1);
+           // setThreshold(2.1);
+		setThreshold(1.5);
         else if(negGenModeHM == 1)
-            setThreshold(2.4);
+           // setThreshold(2.4);
+		setThreshold(1.6);
         break;
     }
     }
@@ -442,7 +445,7 @@ float lemur::retrieval::RetMethod::computeProfDocSim(lemur::api::TextQueryRep *t
     }*/
 
     double negQueryGenerationScore=0.0;
-    if(RSMethodHM == 1)
+    if(RSMethodHM == 1)//RecSys(neg,coll)
     {
         negQueryGenerationScore= qm->negativeQueryGeneration(dRep ,nonReljudgDoc ,negGenModeHM, newNonRel);
     }
@@ -757,12 +760,12 @@ void lemur::retrieval::RetMethod::computeRM1FBModel(QueryModel &origRep,
 
     for (i=1; i<=numTerms;i++) {
         //REMOVE  2 *
-        if(feedbackMode == 2)
+        if(feedbackMode == 2)//normal
         {
             distQuery[i] = expWeight*distQuery[i]/pSum +
                     (1-expWeight)*ind.termCount(i)/ind.termCount();
 
-        }else if(feedbackMode == 1)
+        }else if(feedbackMode == 1)//ours
         {
             distQuery[i] =  expWeight*(getNegWeight()*(distQuery[i]/pSum)-(1-getNegWeight())*(negDistQuery[i]/nSum) )+
                     (1-expWeight)*ind.termCount(i)/ind.termCount();

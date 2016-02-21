@@ -102,23 +102,23 @@ void computeRSMethods(Index* ind)
     double start_negThr = startNegWeight , end_negThr = endNegWeight;
 
     ofstream out(outputFileNameHM.c_str());
-    for (double thresh = start_thresh ; thresh<=end_thresh ; thresh += intervalThresholdHM)
-    //for (double neg = start_negThr ; neg<=end_negThr ; neg += 0.1)
+    //for (double thresh = start_thresh ; thresh<=end_thresh ; thresh += intervalThresholdHM)
+    for (double neg = start_negThr ; neg<=end_negThr ; neg += 0.1)
     {
-        myMethod->setThreshold(thresh);
-        //myMethod->setNegWeight(neg);
+        //myMethod->setThreshold(thresh);
+        myMethod->setNegWeight(neg);
 
 
         IndexedRealVector results;
 
         out<<"threshold: "<<myMethod->getThreshold()<<endl;
-        //out<<"negWeight: "<<myMethod->getNegWeight()<<endl;
+        out<<"negWeight: "<<myMethod->getNegWeight()<<endl;
 
         qs->startDocIteration();
         TextQuery *q;
 
-        resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+".res";
-        //resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(neg)+".res";
+        //resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+".res";
+        resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(neg)+".res";
 
         ofstream result(resultPath.c_str());
         ResultFile resultFile(1);
