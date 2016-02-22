@@ -76,7 +76,7 @@ int main(int argc, char * argv[])
     default:
         judgmentPath = "/home/hossein/Desktop/lemur/DataSets/Infile/Data/qrels_en";
         indexPath = "/home/hossein/Desktop/lemur/DataSets/Infile/Index/en/index.key";
-        queryPath = "/home/hossein/Desktop/lemur/DataSets/Infile/Data/five_q_en_titleKeyword_en.stemmed.xml";//????????
+        queryPath = "/home/hossein/Desktop/lemur/DataSets/Infile/Data/q_en_titleKeyword_en.stemmed.xml";//????????
         break;
     }
 
