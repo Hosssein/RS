@@ -91,9 +91,9 @@ void lemur::api::TextQueryRetMethod::scoreInvertedIndex(const QueryRep &qRep,
         dr = NULL;
         if (scAcc.findScore(i,s)) {
 
-            if(i == ind.document("afp.com-20051012T084831Z-TX-SGE-QIM16.xml") )
+            //if(i == ind.document("afp.com-20051012T084831Z-TX-SGE-QIM16.xml") )
             //if (i == 73)
-                cerr<<"lemur before adj: "<<s<<endl;
+                //cerr<<"lemur before adj: "<<s<<endl;
 
             if (cacheDocReps)
                 dr = docReps[i]; // must be there if there is a score.
