@@ -76,7 +76,7 @@ int main(int argc, char * argv[])
     default:
         judgmentPath = "/home/hossein/Desktop/lemur/DataSets/Infile/Data/qrels_en";
         indexPath = "/home/hossein/Desktop/lemur/DataSets/Infile/Index/en/index.key";
-        queryPath = "/home/hossein/Desktop/lemur/DataSets/Infile/Data/five_q_en_titleKeyword_en.stemmed.xml";//????????
+        queryPath = "/home/hossein/Desktop/lemur/DataSets/Infile/Data/q_en_titleKeyword_en.stemmed.xml";//????????
         break;
     }
 
@@ -105,6 +105,7 @@ void computeRSMethods(Index* ind)
     //for (double thresh = start_thresh ; thresh<=end_thresh ; thresh += intervalThresholdHM)
     for (double neg = start_negThr ; neg<=end_negThr ; neg += 0.1)
     {
+        //double neg =0.7;//????????????????????????????????????????????????
         //myMethod->setThreshold(thresh);
         myMethod->setNegWeight(neg);
 
@@ -230,6 +231,7 @@ void computeRSMethods(Index* ind)
             delete qr;
         }//end queries
 
+        cout<<"neg weight: "<<neg<<endl;
         cout<<"relret: "<<relRetCounter<<" rel: "<<relCounter<<" ret: "<<retCounter<<endl;
         double precision = relRetCounter/retCounter, recall = relRetCounter/relCounter, f = (2*precision*recall)/(precision+recall);
         out<<"precision: "<<precision<<endl;
@@ -241,6 +243,7 @@ void computeRSMethods(Index* ind)
         {
             avgPrec+=queriesPrecision[i];
             avgRecall+= queriesRecall[i];
+            out<<"Prec["<<i<<"] = "<<queriesPrecision[i]<<"\tRecall["<<i<<"] = "<<queriesRecall[i]<<endl;
         }
         avgPrec/=queriesPrecision.size();
         avgRecall/=queriesRecall.size();
@@ -250,6 +253,8 @@ void computeRSMethods(Index* ind)
 
         //break;
         //if(feedbackMode == 0)//no fb
+        //    break;
+        //if(numberOfQueries==2)//????????????????????????????????????????????????????????
         //    break;
 
     }//end for_thr

@@ -199,6 +199,8 @@ public:
                 double pwdbar = (delta/(delta*ind.termCountUnique()+mu))+((mu*pwc)/(delta*ind.termCountUnique()+mu));
                 negQueryGen+= pwq *log(pwq/pwdbar);
 
+		delete qt;
+
             }
 
             //cout<<negQueryGen<<"dddddddddddd\n";
@@ -253,7 +255,7 @@ public:
                 double pwdbar = (cwdbar/(DNsize+mu))+((mu*pwc)/(DNsize+mu));
                 negQueryGen+= pwq *log(pwq/pwdbar);
 
-
+		delete qt;
 
             }
             if (newNonRel)
