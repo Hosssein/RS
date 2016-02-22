@@ -230,15 +230,18 @@ lemur::retrieval::RetMethod::RetMethod(const Index &dbIndex,
     switch (RSMethodHM)
     {
     case 0://lm
-        setThreshold(-4.3);
+       // setThreshold(-4.3);
+	setThreshold(-6.3);
 
         break;
     case 1://negGen
     {
         if(negGenModeHM==0)//col//mu=2500
-            setThreshold(2.1);
+           // setThreshold(2.1);
+		setThreshold(1.5);
         else if(negGenModeHM == 1)
-            setThreshold(2.4);
+           // setThreshold(2.4);
+		setThreshold(1.6);
         break;
     }
     }
@@ -759,8 +762,10 @@ void lemur::retrieval::RetMethod::computeRM1FBModel(QueryModel &origRep,
         //REMOVE  2 *
         if(feedbackMode == 2)//normal
         {
+
             distQuery[i] = expWeight*distQuery[i]/pSum +
                     (1-expWeight)*ind.termCount(i)/ind.termCount();
+            //cout<<distQuery[i]<<endl;
 
         }else if(feedbackMode == 1)//ours
         {
@@ -776,6 +781,9 @@ void lemur::retrieval::RetMethod::computeRM1FBModel(QueryModel &origRep,
             lmCounter.incCount(i, distQuery[i]);
         }
     }
+
+    //cout<<"sum: "<<lmCounter.sum()<<endl;
+
     lemur::langmod::MLUnigramLM *fblm = new lemur::langmod::MLUnigramLM(lmCounter, ind.termLexiconID());
     origRep.interpolateWith(*fblm, 0.0, qryParam.fbTermCount,
                             qryParam.fbPrSumTh, 0.0);

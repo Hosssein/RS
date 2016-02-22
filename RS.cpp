@@ -102,23 +102,24 @@ void computeRSMethods(Index* ind)
     double start_negThr = startNegWeight , end_negThr = endNegWeight;
 
     ofstream out(outputFileNameHM.c_str());
-    for (double thresh = start_thresh ; thresh<=end_thresh ; thresh += intervalThresholdHM)
-    //for (double neg = start_negThr ; neg<=end_negThr ; neg += 0.1)
+    //for (double thresh = start_thresh ; thresh<=end_thresh ; thresh += intervalThresholdHM)
+    for (double neg = start_negThr ; neg<=end_negThr ; neg += 0.1)
     {
-        myMethod->setThreshold(thresh);
-        //myMethod->setNegWeight(neg);
+        //double neg =0.7;//????????????????????????????????????????????????
+        //myMethod->setThreshold(thresh);
+        myMethod->setNegWeight(neg);
 
 
         IndexedRealVector results;
 
         out<<"threshold: "<<myMethod->getThreshold()<<endl;
-        //out<<"negWeight: "<<myMethod->getNegWeight()<<endl;
+        out<<"negWeight: "<<myMethod->getNegWeight()<<endl;
 
         qs->startDocIteration();
         TextQuery *q;
 
-        resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+".res";
-        //resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(neg)+".res";
+        //resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+".res";
+        resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(neg)+".res";
 
         ofstream result(resultPath.c_str());
         ResultFile resultFile(1);
@@ -230,6 +231,7 @@ void computeRSMethods(Index* ind)
             delete qr;
         }//end queries
 
+        cout<<"neg weight: "<<neg<<endl;
         cout<<"relret: "<<relRetCounter<<" rel: "<<relCounter<<" ret: "<<retCounter<<endl;
         double precision = relRetCounter/retCounter, recall = relRetCounter/relCounter, f = (2*precision*recall)/(precision+recall);
         out<<"precision: "<<precision<<endl;
@@ -241,6 +243,7 @@ void computeRSMethods(Index* ind)
         {
             avgPrec+=queriesPrecision[i];
             avgRecall+= queriesRecall[i];
+            out<<"Prec["<<i<<"] = "<<queriesPrecision[i]<<"\tRecall["<<i<<"] = "<<queriesRecall[i]<<endl;
         }
         avgPrec/=queriesPrecision.size();
         avgRecall/=queriesRecall.size();
@@ -250,6 +253,8 @@ void computeRSMethods(Index* ind)
 
         //break;
         //if(feedbackMode == 0)//no fb
+        //    break;
+        //if(numberOfQueries==2)//????????????????????????????????????????????????????????
         //    break;
 
     }//end for_thr
