@@ -4,6 +4,10 @@
 #include <sstream>
 
 
+#include "pugixml.hpp"
+using namespace pugi;
+
+
 using namespace std;
 
 template <typename T>
@@ -15,42 +19,36 @@ string numToStrHM(T number)
 }
 
 double startThresholdHM , endThresholdHM , intervalThresholdHM ,negGenMUHM;
-double startNegWeight ,endNegWeight;
+double startNegWeight ,endNegWeight ,negWeightInterval;
 int RSMethodHM; // 0--> LM , 1--> RecSys
 int negGenModeHM;//0 --> coll , 1--> nonRel
 
 int feedbackMode;//0 --> no fb, 1-->ours , 2-->normal
 
+int updatingThresholdMode;//0 -> no updating, 1->linear
+
 int WHO;// 0--> server , 1-->Mozhdeh, 2-->AP, other-->Hossein
 string outputFileNameHM;
 string resultFileNameHM;
-
+void readParamFile(string paramFileName);
 void readParams(string paramFileName)
 {
-    cout<<"********************\n";
-    ifstream in(paramFileName.c_str());
-    if(in.is_open())
-    {
-        string temp;
-        in>>temp;
-        in>>WHO>>RSMethodHM>>negGenModeHM>>negGenMUHM>>startThresholdHM
-         >>endThresholdHM>>intervalThresholdHM>>feedbackMode>>startNegWeight>>endNegWeight;
-        //cout<<WHO<<" "<<RSMethodHM<<" "<<negGenModeHM<<" "<<negGenMUHM<<" "<<startThresholdHM<<" "<<endThresholdHM<<" "<<intervalThresholdHM<<endl;
-    }
+    readParamFile(paramFileName);
+
     if(RSMethodHM==1)
     {
         if(negGenModeHM == 0)
         {
 
-            outputFileNameHM = "out/RecSys_NegGenColl_";
-            resultFileNameHM ="res/RecSys_NegGenColl_";
+            outputFileNameHM = "out/NegColl_";
+            resultFileNameHM ="res/NegColl_";
         }else if(negGenModeHM == 1)
         {
-            outputFileNameHM += "out/RecSys_NegGenNonRel_";
-            resultFileNameHM =+ "res/NegGenNonRel_";
+            outputFileNameHM += "out/NegNonRel_";
+            resultFileNameHM += "res/NegNonRel_";
         }
-	outputFileNameHM+=numToStrHM(negGenMUHM)+"_";
-	resultFileNameHM+=numToStrHM(negGenMUHM)+"_";
+        outputFileNameHM+=numToStrHM(negGenMUHM)+"_";
+        resultFileNameHM+=numToStrHM(negGenMUHM)+"_";
     }else if (RSMethodHM == 0)
     {
         outputFileNameHM += "out/LM_";
@@ -63,7 +61,7 @@ void readParams(string paramFileName)
         resultFileNameHM += "Nofb_";
     }else if(feedbackMode == 1)//ours
     {
-        outputFileNameHM+="negFB_"+numToStrHM(startNegWeight)+":"+numToStrHM(endNegWeight)+"_";
+        outputFileNameHM+="negFB_negWeight:_"+numToStrHM(startNegWeight)+":"+numToStrHM(endNegWeight)+"("+numToStrHM(negWeightInterval)+")_";
         resultFileNameHM += "negFB_";
     }else if(feedbackMode == 2)//normal feedback
     {
@@ -71,6 +69,82 @@ void readParams(string paramFileName)
         resultFileNameHM += "normalFB_";
     }
 
-    outputFileNameHM += numToStrHM(startThresholdHM)+":"+numToStrHM(endThresholdHM);
+    if(updatingThresholdMode == 0)//no updating
+    {
+        outputFileNameHM +="noUpdatingThr_";
+        resultFileNameHM += "noUpdatingThr_";
 
+    }else if(updatingThresholdMode == 1)//linear
+    {
+        outputFileNameHM+="linearUpdatingThr_";
+        resultFileNameHM += "linearUpdatingThr_";
+
+    }
+    outputFileNameHM += "profDocThr:_"+numToStrHM(startThresholdHM)+":"+numToStrHM(endThresholdHM)+"("+numToStrHM(intervalThresholdHM)+")";
+
+}
+
+
+void readParamFile(string paramfileName)
+{
+    xml_document doc;
+    xml_parse_result result = doc.load_file(paramfileName.c_str());// Your own path to original format of queries
+    if(result.status != 0)
+        cerr<<"\n\nCANT READ PARAM FILE!!!\n\n";
+    xml_node topics = doc.child("parameters");
+
+    for (xml_node_iterator topic = topics.begin(); topic != topics.end(); topic++)
+    {
+        istringstream iss ;
+        iss.str(topic->child("Who").first_child().value());
+        iss>>WHO;
+
+        iss.clear();
+        iss.str ( topic->child("RetMethod").first_child().value());
+        iss >> RSMethodHM ;
+
+        iss.clear();
+        iss.str( topic->child("NegativeMode").first_child().value());
+        iss>>negGenModeHM;
+
+        iss.clear();
+        iss.str(topic->child("NegMu").first_child().value());
+        iss>>negGenMUHM;
+
+        iss.clear();
+        iss.str( topic->child("StartThr").first_child().value());
+        iss>>startThresholdHM;
+
+        iss.clear();
+        iss.str( topic->child("EndThr").first_child().value());
+        iss>>endThresholdHM;
+
+        iss.clear();
+        iss.str( topic->child("ProfDocSimInterval").first_child().value());
+        iss>>intervalThresholdHM;
+
+        iss.clear();
+        iss.str( topic->child("FBMode").first_child().value());
+        iss>>feedbackMode;
+
+        iss.clear();
+        iss.str( topic->child("StartNegWeight").first_child().value());
+        iss>>startNegWeight;
+
+        iss.clear();
+        iss.str( topic->child("EndNegWeight").first_child().value());
+        iss>>endNegWeight;
+
+        iss.clear();
+        iss.str( topic->child("NegWeightInterval").first_child().value());
+        iss>>negWeightInterval;
+
+        iss.clear();
+        iss.str( topic->child("UpdatingThrMode").first_child().value());
+        iss>>updatingThresholdMode;
+
+//        cout<<WHO<<RSMethodHM<<negGenModeHM<<negGenMUHM<<startThresholdHM<<endThresholdHM<<intervalThresholdHM<<feedbackMode<<
+//            startNegWeight<<endNegWeight<<  negWeightInterval<<updatingThresholdMode;
+
+    }
 }
