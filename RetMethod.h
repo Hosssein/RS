@@ -467,7 +467,7 @@ public:
     virtual void updateProfile(lemur::api::TextQueryRep &origRep,
                                vector<int> relJudglDoc ,vector<int> nonReljudgDoc);
     virtual void updateThreshold(lemur::api::TextQueryRep &origRep,
-                                 vector<int> relJudglDoc ,vector<int> nonReljudgDoc ,int mode);
+                                 vector<int> relJudglDoc ,vector<int> nonReljudgDoc ,int mode,double relSumScores , double nonRelSumScores);
     virtual float computeProfDocSim(lemur::api::TextQueryRep *origRep,int docID ,vector<int>relDocs ,vector<int>nonRelDocs , bool newNonRel);
 
 
@@ -486,19 +486,26 @@ public:
         mozhdehHosseinNegWeight =negw;
     }
 
+    //for linear thr updating method
     double getC1(){return C1;}
     void setC1(double val){C1=val;}
     double getC2(){return C2;}
     void setC2(double val){C2=val;}
 
+    //for diff thr updating method
+    void setDiffThrUpdatingParam(double alpha){diffThrUpdatingParam=alpha;}
+    double getDiffThrUpdatingParam(){return diffThrUpdatingParam;}
 
 protected:
     double mozhdehHosseinThreshold;
     double mozhdehHosseinNegWeight;
     mutable int thresholdUpdatingMethod;/* 0->no updating
                                            1->linear
+                                           2->diff
                                         */
-    double C1,C2;
+    double C1,C2;//for linear
+    double diffThrUpdatingParam;//for diff
+
     //Matrix Factorization method for query expansion
     bool MF;
 

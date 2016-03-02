@@ -390,7 +390,7 @@ void lemur::retrieval::RetMethod::updateProfile(lemur::api::TextQueryRep &origRe
     delete nonRelDocs;
 }
 void lemur::retrieval::RetMethod::updateThreshold(lemur::api::TextQueryRep &origRep,
-                                                  vector<int> relJudgDoc ,vector<int> nonReljudgDoc , int mode)
+                                                  vector<int> relJudgDoc ,vector<int> nonReljudgDoc , int mode,double relSumScores ,double nonRelSumScore)
 {
     thresholdUpdatingMethod = updatingThresholdMode;
     //double alpha = 0.3,beta = 0.9;
@@ -410,7 +410,26 @@ void lemur::retrieval::RetMethod::updateThreshold(lemur::api::TextQueryRep &orig
         }
 
         //threshold = -4.5;
+    }else if (thresholdUpdatingMethod == 2)//diff rel nonrel method
+    {
+        double alpha = getDiffThrUpdatingParam();
+        double relSize = relJudgDoc.size();
+        double nonRelSize = nonReljudgDoc.size();
+        double val =  alpha * std::max( ((relSumScores/(relSize+1)+0.005) - (nonRelSumScore/(nonRelSize+1)+0.005)) ,-3.5) *
+                (std::abs(std::log10( (nonRelSize+1) / (relSize+1) ) + 0.005 ) );
+
+
+        if(mode == 0)
+            setThreshold(getThreshold() + val);
+        else
+            setThreshold(getThreshold() - val);
+        //cout<<relSumScores<<" "<<relSize<<endl;
+        //cout<<alpha<<" "<<(relSumScores/(relSize+1.0))<<" "<<(nonRelSumScore/nonRelSize+1)<<" "<<(std::log10( (nonRelSize+1) / (relSize+1) ) + 0.005 )<<endl;
+        cout <<"mode "<<mode<<" alpha "<<alpha <<" relSum: "<<(relSumScores/(relSize+1)+0.005)<<" nonRelSum: "<< (nonRelSumScore/(nonRelSize+1)+0.005) <<" val: "<<val<<" log: "<<std::log10( (nonRelSize+1) / (relSize+1) );
+        cout<<" thr: "<<getThreshold()<<endl;
     }
+
+
 }
 
     float lemur::retrieval::RetMethod::computeProfDocSim(lemur::api::TextQueryRep *textQR,int docID ,
