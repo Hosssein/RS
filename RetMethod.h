@@ -199,6 +199,10 @@ public:
                 double pwdbar = (delta/(delta*ind.termCountUnique()+mu))+((mu*pwc)/(delta*ind.termCountUnique()+mu));
                 negQueryGen+= pwq *log(pwq/pwdbar);
 
+
+                delete qt;
+
+
             }
 
             //cout<<negQueryGen<<"dddddddddddd\n";
@@ -254,6 +258,8 @@ public:
                 negQueryGen+= pwq *log(pwq/pwdbar);
 
 
+                delete qt;
+
 
             }
             if (newNonRel)
@@ -264,6 +270,64 @@ public:
         }
 
     }
+    double interpolateSimsScore(lemur::api::TextQueryRep *textQR,int docID ,
+                                                         vector<int> relJudgDoc ,vector<int> nonReljudgDoc , bool newNonRel)
+    {
+        return 0.0;
+#if 0
+        double relSim =0.0, nonRelSim = 0.0;
+        double mu = 2500;
+
+        //***********nonRelSim*******************//
+        if (newNonRel)
+            DNsize += ind.docLength(JudgDocs[JudgDocs.size()-1]);
+
+        lemur::api::COUNT_T tc = ind.termCount();
+        startIteration();
+        lemur::utility::HashFreqVector hfv(ind,dRep->getID()), *hfv2;
+        if (newNonRel)
+            hfv2 = new lemur::utility::HashFreqVector(ind,JudgDocs[JudgDocs.size()-1]);
+        while (hasMore())
+        {
+            lemur::api::QueryTerm *qt = nextTerm();
+            double pwq = qt->weight()/totalCount();
+            if (newNonRel)
+            {
+                int freq;
+                hfv2->find(qt->id(),freq);
+                countInNonRel[qt->id()] += freq;
+            }
+            double cwdbar = 0;
+            int freq=0 ;
+            hfv.find(qt->id(),freq);
+            /*
+            if(freq>0)
+                cwdbar = 0;
+            else
+            {
+                cwdbar = countInNonRel[qt->id()];
+            }
+            */
+
+            lemur::api::TERMID_T id = qt->id();
+
+            lemur::api::COUNT_T qtcf = ind.termCount(id);
+
+            double pwc = (double)qtcf/(double)tc;
+
+            cwdbar = countInNonRel[qt->id()];
+
+            double pwdbar = (cwdbar/(DNsize+mu))+((mu*pwc)/(DNsize+mu));
+            negQueryGen+= pwq *log(pwq/pwdbar);
+
+            delete qt;
+        }
+
+        if (newNonRel)
+            delete hfv2;
+#endif
+    }
+
 
 
 protected:
@@ -275,6 +339,9 @@ protected:
 
     mutable map <int, int> countInNonRel;
     mutable int DNsize ;
+
+
+
     lemur::api::IndexedRealVector *qm;
     const lemur::api::Index &ind;
 };
@@ -308,7 +375,7 @@ public:
                                      const lemur::api::DocInfo *info,
                                      const lemur::api::DocumentRep *dRep) const {
         double w = qTerm->weight();
-        double d = dRep->termWeight(qTerm->id(),info);
+        double d = dRep->termWeight(qTerm->id(),info);//d = p_seen(w|d)/(a(d)*p(w|C)) [slide7-11]
         double l = log(d);
         double score = w*l;
         //cout<<info->docID()<<endl;
@@ -328,9 +395,9 @@ public:
         //SimpleKLDocModel *dm = (SimpleKLDocModel *)dRep;
         // dynamic_cast<SimpleKLDocModel *>dRep;
 
-        double qsc = qm->scoreConstant();
-        double dsc = log(dRep->scoreConstant());
-        double cql = qm->colQueryLikelihood();
+        double qsc = qm->scoreConstant();//|q|
+        double dsc = log(dRep->scoreConstant());//log(a(d))
+        double cql = qm->colQueryLikelihood();//sigma(c(w,q)*P(w|C))
         // real query likelihood
         double s = dsc * qsc + origScore + cql;
         double qsNorm = origScore/qsc;
@@ -400,8 +467,9 @@ public:
     virtual void updateProfile(lemur::api::TextQueryRep &origRep,
                                vector<int> relJudglDoc ,vector<int> nonReljudgDoc);
     virtual void updateThreshold(lemur::api::TextQueryRep &origRep,
-                                 vector<int> relJudglDoc ,vector<int> nonReljudgDoc);
+                                 vector<int> relJudglDoc ,vector<int> nonReljudgDoc ,int mode,double relSumScores , double nonRelSumScores);
     virtual float computeProfDocSim(lemur::api::TextQueryRep *origRep,int docID ,vector<int>relDocs ,vector<int>nonRelDocs , bool newNonRel);
+
 
     void setDocSmoothParam(RetParameter::DocSmoothParam &docSmthParam);
     void setQueryModelParam(RetParameter::QueryModelParam &queryModParam);
@@ -418,11 +486,26 @@ public:
         mozhdehHosseinNegWeight =negw;
     }
 
+    //for linear thr updating method
+    double getC1(){return C1;}
+    void setC1(double val){C1=val;}
+    double getC2(){return C2;}
+    void setC2(double val){C2=val;}
 
+    //for diff thr updating method
+    void setDiffThrUpdatingParam(double alpha){diffThrUpdatingParam=alpha;}
+    double getDiffThrUpdatingParam(){return diffThrUpdatingParam;}
 
 protected:
     double mozhdehHosseinThreshold;
     double mozhdehHosseinNegWeight;
+    mutable int thresholdUpdatingMethod;/* 0->no updating
+                                           1->linear
+                                           2->diff
+                                        */
+    double C1,C2;//for linear
+    double diffThrUpdatingParam;//for diff
+
     //Matrix Factorization method for query expansion
     bool MF;
 
