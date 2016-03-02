@@ -258,6 +258,8 @@ public:
                 negQueryGen+= pwq *log(pwq/pwdbar);
 
 
+             //   cout<<"cwdbar: "<<cwdbar<<"\npwc: "<<pwc<<"\npwdbar: "<<pwdbar<<endl;
+
                 delete qt;
 
 
@@ -265,6 +267,8 @@ public:
             if (newNonRel)
                 delete hfv2;
             //}
+//            cout<<"Did: "<<dRep->getID()<<endl;
+  //          cout<<"DNsize: "<<DNsize<<"\nnegQueryGen: "<<negQueryGen<<endl<<endl;
             return negQueryGen;
             //cout<<negQueryGen<<"dddddddddddd\n";
         }

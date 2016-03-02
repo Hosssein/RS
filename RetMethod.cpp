@@ -200,7 +200,7 @@ lemur::retrieval::RetMethod::RetMethod(const Index &dbIndex,
     //docParam.ADDelta = RetParameter::defaultADDelta;
     docParam.JMLambda = RetParameter::defaultJMLambda;
     //docParam.JMLambda = 0.9;
-    docParam.DirPrior = 50;//RetParameter::defaultDirPrior;
+    docParam.DirPrior = dbIndex.docLengthAvg();//50;//RetParameter::defaultDirPrior;
 
     qryParam.adjScoreMethod = RetParameter::NEGATIVEKLD;
     //qryParam.adjScoreMethod = RetParameter::QUERYLIKELIHOOD;
@@ -821,6 +821,7 @@ void lemur::retrieval::RetMethod::updateThreshold(lemur::api::TextQueryRep &orig
         delete[] distQuery;
         delete[] negDistQuery;
     }
+}
     void lemur::retrieval::RetMethod::computeRM3FBModel(QueryModel &origRep,
                                                         const DocIDSet &relDocs)
     {
@@ -944,7 +945,9 @@ void lemur::retrieval::RetMethod::updateThreshold(lemur::api::TextQueryRep &orig
     }
 
     void lemur::retrieval::RetMethod::computeRM4FBModel(QueryModel &origRep,
-                                                        const DocIDSet &relDocs){
+                                                        const DocIDSet &relDocs)
+    {
+        cout<<"haha";
         // Write Your own RM4 right here
     }
 
