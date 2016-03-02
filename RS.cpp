@@ -64,7 +64,7 @@ int main(int argc, char * argv[])
     case 1:
         judgmentPath = "/home/mozhdeh/Desktop/INFILE/hosein-data/qrels_en";
         indexPath = "/home/mozhdeh/Desktop/INFILE/javid-index/index.key";
-        queryPath = "/home/mozhdeh/Desktop/INFILE/hosein-data/q_en_titleKeyword_en.stemmed (copy).xml";
+        queryPath = "/home/mozhdeh/Desktop/INFILE/hosein-data/q_en_titleKeyword_en.stemmed.xml";
         break;
     //case 2:
     //    judgmentPath ="/home/mozhdeh/Desktop/AP/Data/jud-ap.txt";
@@ -112,7 +112,7 @@ void computeRSMethods(Index* ind)
 
         //out<<"threshold: "<<myMethod->getThreshold()<<endl;
         out<<"negWeight: "<<myMethod->getNegWeight()<<endl;
-
+        cout<<myMethod->getThreshold()<<endl;
         qs->startDocIteration();
         TextQuery *q;
         resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(neg)+".res";
@@ -182,9 +182,9 @@ void computeRSMethods(Index* ind)
                     results.PushValue(docID , sim);
                     if (results.size() %20 == 0 && feedbackMode > 0)
                     {
-                        cout<<"Updating profile. Result size: "<<results.size()<<endl;
+                    //    cout<<"Updating profile. Result size: "<<results.size()<<endl;
 
-                        myMethod->updateProfile(*((TextQueryRep *)(qr)),relJudgDocs , nonRelJudgDocs );
+                     //   myMethod->updateProfile(*((TextQueryRep *)(qr)),relJudgDocs , nonRelJudgDocs );
                     }
                     //myMethod->updateThreshold(*((TextQueryRep *)(qr)), relJudgDocs , nonRelJudgDocs );
 

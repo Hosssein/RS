@@ -759,11 +759,13 @@ void lemur::retrieval::RetMethod::computeRM1FBModel(QueryModel &origRep,
         //REMOVE  2 *
         if(feedbackMode == 2)
         {
+            cout<<"normalFB"<<endl;
             distQuery[i] = expWeight*distQuery[i]/pSum +
                     (1-expWeight)*ind.termCount(i)/ind.termCount();
 
         }else if(feedbackMode == 1)
         {
+            cout<<"ourFB"<<endl;
             distQuery[i] =  expWeight*(getNegWeight()*(distQuery[i]/pSum)-(1-getNegWeight())*(negDistQuery[i]/nSum) )+
                     (1-expWeight)*ind.termCount(i)/ind.termCount();
         }
