@@ -125,7 +125,7 @@ void computeRSMethods(Index* ind)
     cout<< "RSMethod: "<<RSMethodHM<<" NegGenMode: "<<negGenModeHM<<" feedbackMode: "<<feedbackMode<<" updatingThrMode: "<<updatingThresholdMode<<"\n";
 
 
-#if RETMODE == 0
+#if RETMODE == 0 
     double start_thresh =startThresholdHM, end_thresh= endThresholdHM;
     double start_negMu =startNegMu, end_negMu= endNegMu;
     double start_delta =startDelta, end_delta= endDelta;

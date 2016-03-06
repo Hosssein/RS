@@ -481,6 +481,10 @@ void lemur::retrieval::RetMethod::updateThreshold(lemur::api::TextQueryRep &orig
             {
                 negQueryGenerationScore= qm->negativeQueryGeneration(dRep ,nonReljudgDoc ,negGenModeHM, newNonRel,NegMu,delta);
             }
+            else if (RSMethodHM == 2)//RecSys negKL
+            {    
+                negQueryGenerationScore = qm->negativeKL(dRep ,nonReljudgDoc , newNonRel,NegMu);
+            }
 
             double adjustedScore = scoreFunc()->adjustedScore(sc, textQR, dRep);
 

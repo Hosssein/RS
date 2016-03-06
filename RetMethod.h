@@ -258,6 +258,61 @@ public:
         }
 
     }
+
+    double negativeKL(const lemur::api::DocumentRep *dRep, vector<int> JudgDocs, bool newNonRel, double negMu, double beta = 1) const
+    {
+       if (newNonRel)
+            DNsize += ind.docLength(JudgDocs[JudgDocs.size()-1]);
+
+        double mu= negMu;//ind.docLengthAvg();//negGenMUHM;//2500;
+        negQueryGen =0;
+        //if(negQueryGen == 0)
+        //{
+        lemur::api::COUNT_T tc = ind.termCount();
+        startIteration();
+        lemur::utility::HashFreqVector hfv(ind,dRep->getID()), *hfv2;
+        if (newNonRel)
+            hfv2 = new lemur::utility::HashFreqVector(ind,JudgDocs[JudgDocs.size()-1]);
+        while (hasMore())
+        {
+
+            lemur::api::QueryTerm *qt = nextTerm();
+            double pwq = qt->weight()/totalCount();
+            if (newNonRel)
+            {
+                int freq;
+                hfv2->find(qt->id(),freq);
+                countInNonRel[qt->id()] += freq;
+            }
+            double cwdbar = 0;
+            int freq=0 ;
+            hfv.find(qt->id(),freq);
+            cwdbar = countInNonRel[qt->id()];
+            lemur::api::TERMID_T id = qt->id();
+
+            lemur::api::COUNT_T qtcf = ind.termCount(id);
+
+            double pwc = (double)qtcf/(double)tc;
+            double pwd =  ((double)freq/((double)ind.docLength(dRep->getID())+mu))+((mu*pwc)/((double)ind.docLength(dRep->getID())+mu)) ;
+            double pwdbar = (cwdbar/(DNsize+mu))+((mu*pwc)/(DNsize+mu));
+            negQueryGen+= pwdbar *log(pwdbar/pwd);
+
+
+         //   cout<<"cwdbar: "<<cwdbar<<"\npwc: "<<pwc<<"\npwdbar: "<<pwdbar<<endl;
+
+            delete qt;
+
+
+        }
+        if (newNonRel)
+            delete hfv2;
+        //}
+            cout<<"Did: "<<dRep->getID()<<endl;
+          cout<<"DNsize: "<<DNsize<<"\nnegQueryGen: "<<negQueryGen<<endl<<endl;
+        return negQueryGen;
+
+
+    }
     double interpolateSimsScore(lemur::api::TextQueryRep *textQR,int docID ,
                                                          vector<int> relJudgDoc ,vector<int> nonReljudgDoc , bool newNonRel)
     {
