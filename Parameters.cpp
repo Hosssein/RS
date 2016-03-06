@@ -21,6 +21,8 @@ string numToStrHM(T number)
 double startThresholdHM , endThresholdHM , intervalThresholdHM ,negGenMUHM;
 double startNegWeight ,endNegWeight ,negWeightInterval;
 double startNegMu, endNegMu, NegMuInterval;
+double startDelta, endDelta, deltaInterval;
+
 int RSMethodHM; // 0--> LM , 1--> RecSys
 int negGenModeHM;//0 --> coll , 1--> nonRel
 
@@ -87,6 +89,7 @@ void readParams(string paramFileName)
 
     outputFileNameHM += "profDocThr:_"+numToStrHM(startThresholdHM)+":"+numToStrHM(endThresholdHM)+"("+numToStrHM(intervalThresholdHM)+")";
     outputFileNameHM += "NegMu:_"+numToStrHM(startNegMu)+":"+numToStrHM(endNegMu)+"("+numToStrHM(NegMuInterval)+")";
+    outputFileNameHM += "Delta:_"+numToStrHM(startDelta)+":"+numToStrHM(endDelta)+"("+numToStrHM(deltaInterval)+")";
 
 }
 
@@ -127,6 +130,18 @@ void readParamFile(string paramfileName)
         iss.clear();
         iss.str( topic->child("NegMuInterval").first_child().value());
         iss>>NegMuInterval;
+
+        iss.clear();
+        iss.str( topic->child("StartDelta").first_child().value());
+        iss>>startDelta;
+
+        iss.clear();
+        iss.str( topic->child("EndDelta").first_child().value());
+        iss>>endDelta;
+
+        iss.clear();
+        iss.str( topic->child("deltaInterval").first_child().value());
+        iss>>deltaInterval;
 
         iss.clear();
         iss.str( topic->child("StartThr").first_child().value());

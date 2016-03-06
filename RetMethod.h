@@ -153,26 +153,16 @@ public:
      * wichMethod: 0 --> baseline collection
      *             1 --> baseline nonRel
     */
-    double negativeQueryGeneration( const lemur::api::DocumentRep *dRep, vector<int> JudgDocs  , int whichMethod , bool newNonRel, double negMu) const
+    double negativeQueryGeneration( const lemur::api::DocumentRep *dRep, vector<int> JudgDocs  , int whichMethod , bool newNonRel, double negMu , double delta) const
     {
 
         if(whichMethod == 0)//baseline(collection)
         {
-            double readedDelta=0.007;
-            /* ifstream myfile ("delta.txt");
-            if (myfile.is_open())
-            {
-                myfile >> readedDelta;
-                myfile.close();
-            }else{
-              //   cout<<"cheraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa????\n";
-            }
-            */
-            //cout<<readedDelta<<"\n";
+            double readedDelta=delta;//0.007;
+
             double mu= negMu;//ind.docLengthAvg();//negGenMUHM;//2500;
             negQueryGen =0;
-            //   if(negQueryGen == 0)
-            // {
+
 
             lemur::api::COUNT_T tc = ind.termCount();
             startIteration();
@@ -199,14 +189,8 @@ public:
                 double pwdbar = (delta/(delta*ind.termCountUnique()+mu))+((mu*pwc)/(delta*ind.termCountUnique()+mu));
                 negQueryGen+= pwq *log(pwq/pwdbar);
 
-
                 delete qt;
-
-
             }
-
-            //cout<<negQueryGen<<"dddddddddddd\n";
-            // }
             return negQueryGen;
 
         }else if (whichMethod == 1)// using DN instead of collection
@@ -503,6 +487,10 @@ public:
 
     double getNegMu(){return NegMu;}
     void setNegMu(double val){NegMu=val;}
+
+    double getDelta(){return delta;}
+    void setDelta(double val){delta = val;}
+
 protected:
     double mozhdehHosseinThreshold;
     double mozhdehHosseinNegWeight;
@@ -514,6 +502,8 @@ protected:
     double diffThrUpdatingParam;//for diff
 
     double NegMu;
+    double delta;
+
     //Matrix Factorization method for query expansion
     bool MF;
 

@@ -46,6 +46,7 @@ extern string resultFileNameHM;
 extern int feedbackMode;
 extern double startNegWeight,endNegWeight , negWeightInterval;
 extern double startNegMu, endNegMu, NegMuInterval;
+extern double startDelta, endDelta, deltaInterval;
 extern int RSMethodHM;
 extern int negGenModeHM;
 
@@ -127,13 +128,26 @@ void computeRSMethods(Index* ind)
 #if RETMODE == 0
     double start_thresh =startThresholdHM, end_thresh= endThresholdHM;
     double start_negMu =startNegMu, end_negMu= endNegMu;
+    double start_delta =startDelta, end_delta= endDelta;
+
     for (double thresh = start_thresh ; thresh<=end_thresh ; thresh += intervalThresholdHM)
     {
+#if 1
+        myMethod->setThreshold(thresh);
+        for (double delta = start_delta ; delta<=end_delta ; delta += deltaInterval)
+        {
+            myMethod->setDelta(delta);
+            resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(delta)+".res";
+            myMethod->setNegMu(2500);
+#endif
+#if 0
         myMethod->setThreshold(thresh);
         for (double negmu = start_negMu ; negmu<=end_negMu ; negmu += NegMuInterval)
     	{
     		myMethod->setNegMu(negmu);
     		resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(negmu)+".res";
+#endif
+
 #endif
 
 #if RETMODE == 1 && NEGMODE == 0
@@ -176,7 +190,9 @@ void computeRSMethods(Index* ind)
 
 
                                 IndexedRealVector results;
-                                out<<"threshold: "<<myMethod->getThreshold()<< " negmu: "<<myMethod->getNegMu()<<endl;
+                                out<<"threshold: "<<myMethod->getThreshold()<< " negmu: "<<myMethod->getNegMu();
+                                out<<" delta: "<<myMethod->getDelta()<<endl;
+
                                 qs->startDocIteration();
                                 TextQuery *q;
 
@@ -189,7 +205,7 @@ void computeRSMethods(Index* ind)
                                 while(qs->hasMore())
                                 {
 #if UPDTHRMODE != 0
-                                    myMethod->setThreshold(-6.3);
+                                    myMethod->setThreshold(-6.3 FIXME!!!!);
 #endif
 
 
