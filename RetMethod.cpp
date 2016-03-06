@@ -224,6 +224,7 @@ lemur::retrieval::RetMethod::RetMethod(const Index &dbIndex,
     uniqueTermCount = NULL;
     mcNorm = NULL;
 
+    NegMu = ind.docLengthAvg();
     collectLMCounter = new lemur::langmod::DocUnigramCounter(ind);
     collectLM = new lemur::langmod::MLUnigramLM(*collectLMCounter, ind.termLexiconID());
 
@@ -476,7 +477,7 @@ void lemur::retrieval::RetMethod::updateThreshold(lemur::api::TextQueryRep &orig
             double negQueryGenerationScore=0.0;
             if(RSMethodHM == 1)//RecSys(neg,coll)
             {
-                negQueryGenerationScore= qm->negativeQueryGeneration(dRep ,nonReljudgDoc ,negGenModeHM, newNonRel);
+                negQueryGenerationScore= qm->negativeQueryGeneration(dRep ,nonReljudgDoc ,negGenModeHM, newNonRel,NegMu);
             }
 
             double adjustedScore = scoreFunc()->adjustedScore(sc, textQR, dRep);

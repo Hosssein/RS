@@ -153,7 +153,7 @@ public:
      * wichMethod: 0 --> baseline collection
      *             1 --> baseline nonRel
     */
-    double negativeQueryGeneration( const lemur::api::DocumentRep *dRep, vector<int> JudgDocs  , int whichMethod , bool newNonRel) const
+    double negativeQueryGeneration( const lemur::api::DocumentRep *dRep, vector<int> JudgDocs  , int whichMethod , bool newNonRel, double negMu) const
     {
 
         if(whichMethod == 0)//baseline(collection)
@@ -169,7 +169,7 @@ public:
             }
             */
             //cout<<readedDelta<<"\n";
-            double mu= ind.docLengthAvg();//negGenMUHM;//2500;
+            double mu= negMu;//ind.docLengthAvg();//negGenMUHM;//2500;
             negQueryGen =0;
             //   if(negQueryGen == 0)
             // {
@@ -214,7 +214,7 @@ public:
             if (newNonRel)
                 DNsize += ind.docLength(JudgDocs[JudgDocs.size()-1]);
 
-            double mu= ind.docLengthAvg();//negGenMUHM;//2500;
+            double mu= negMu;//ind.docLengthAvg();//negGenMUHM;//2500;
             negQueryGen =0;
             //if(negQueryGen == 0)
             //{
@@ -500,6 +500,9 @@ public:
     void setDiffThrUpdatingParam(double alpha){diffThrUpdatingParam=alpha;}
     double getDiffThrUpdatingParam(){return diffThrUpdatingParam;}
 
+
+    double getNegMu(){return NegMu;}
+    void setNegMu(double val){NegMu=val;}
 protected:
     double mozhdehHosseinThreshold;
     double mozhdehHosseinNegWeight;
@@ -510,6 +513,7 @@ protected:
     double C1,C2;//for linear
     double diffThrUpdatingParam;//for diff
 
+    double NegMu;
     //Matrix Factorization method for query expansion
     bool MF;
 

@@ -20,6 +20,7 @@ string numToStrHM(T number)
 
 double startThresholdHM , endThresholdHM , intervalThresholdHM ,negGenMUHM;
 double startNegWeight ,endNegWeight ,negWeightInterval;
+double startNegMu, endNegMu, NegMuInterval;
 int RSMethodHM; // 0--> LM , 1--> RecSys
 int negGenModeHM;//0 --> coll , 1--> nonRel
 
@@ -47,8 +48,8 @@ void readParams(string paramFileName)
             outputFileNameHM += "out/NegNonRel_";
             resultFileNameHM += "res/NegNonRel_";
         }
-        outputFileNameHM+=numToStrHM(negGenMUHM)+"_";
-        resultFileNameHM+=numToStrHM(negGenMUHM)+"_";
+        //outputFileNameHM+=numToStrHM(negGenMUHM)+"_";
+        //resultFileNameHM+=numToStrHM(negGenMUHM)+"_";
     }else if (RSMethodHM == 0)
     {
         outputFileNameHM += "out/LM_";
@@ -85,6 +86,7 @@ void readParams(string paramFileName)
     }
 
     outputFileNameHM += "profDocThr:_"+numToStrHM(startThresholdHM)+":"+numToStrHM(endThresholdHM)+"("+numToStrHM(intervalThresholdHM)+")";
+    outputFileNameHM += "NegMu:_"+numToStrHM(startNegMu)+":"+numToStrHM(endNegMu)+"("+numToStrHM(NegMuInterval)+")";
 
 }
 
@@ -111,9 +113,20 @@ void readParamFile(string paramfileName)
         iss.str( topic->child("NegativeMode").first_child().value());
         iss>>negGenModeHM;
 
+      //  iss.clear();
+       // iss.str(topic->child("NegMu").first_child().value());
+        //iss>>negGenMUHM;
         iss.clear();
-        iss.str(topic->child("NegMu").first_child().value());
-        iss>>negGenMUHM;
+        iss.str( topic->child("StartNegMu").first_child().value());
+        iss>>startNegMu;
+
+        iss.clear();
+        iss.str( topic->child("EndNegMu").first_child().value());
+        iss>>endNegMu;
+
+        iss.clear();
+        iss.str( topic->child("NegMuInterval").first_child().value());
+        iss>>NegMuInterval;
 
         iss.clear();
         iss.str( topic->child("StartThr").first_child().value());

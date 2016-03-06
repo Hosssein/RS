@@ -45,7 +45,7 @@ extern string outputFileNameHM;
 extern string resultFileNameHM;
 extern int feedbackMode;
 extern double startNegWeight,endNegWeight , negWeightInterval;
-
+extern double startNegMu, endNegMu, NegMuInterval;
 extern int RSMethodHM;
 extern int negGenModeHM;
 
@@ -106,7 +106,7 @@ void computeRSMethods(Index* ind)
 
 
 
-    string outFilename =outputFileNameHM+"_run1";
+    string outFilename =outputFileNameHM;//+"_run1";
     ofstream out(outFilename.c_str());
 
 
@@ -126,10 +126,14 @@ void computeRSMethods(Index* ind)
 
 #if RETMODE == 0
     double start_thresh =startThresholdHM, end_thresh= endThresholdHM;
+    double start_negMu =startNegMu, end_negMu= endNegMu;
     for (double thresh = start_thresh ; thresh<=end_thresh ; thresh += intervalThresholdHM)
     {
         myMethod->setThreshold(thresh);
-
+        for (double negmu = start_negMu ; negmu<=end_negMu ; negmu += NegMuInterval)
+    	{
+    		myMethod->setNegMu(negmu);
+    		resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(negmu)+".res";
 #endif
 
 #if RETMODE == 1 && NEGMODE == 0
@@ -172,7 +176,7 @@ void computeRSMethods(Index* ind)
 
 
                                 IndexedRealVector results;
-                                out<<"threshold: "<<myMethod->getThreshold()<<endl;
+                                out<<"threshold: "<<myMethod->getThreshold()<< " negmu: "<<myMethod->getNegMu()<<endl;
                                 qs->startDocIteration();
                                 TextQuery *q;
 
@@ -346,6 +350,7 @@ void computeRSMethods(Index* ind)
 
 #if RETMODE == 0
                             }//end for_thr
+                        }
 #endif
 
 
