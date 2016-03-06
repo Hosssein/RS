@@ -111,29 +111,31 @@ void computeRSMethods(Index* ind)
     ofstream out(outFilename.c_str());
 
 
-    /*
+/*
 #define RETMODE 1//LM(0) ,RS(1)
-#define NEGMODE 1//coll(0) ,NonRel(1)
+    //#define NEGMODE 0//coll(0) ,NonRel(1)
 #define FBMODE 0//NoFB(0),NonRel(1),Normal(2)
-#define UPDTHRMODE 2//No(0),Linear(1) ,Diff(2)
+#define UPDTHRMODE 0//No(0),Linear(1) ,Diff(2)
 */
+
 #define RETMODE RSMethodHM//LM(0) ,RS(1)
-#define NEGMODE negGenModeHM//coll(0) ,NonRel(1)
+//#define NEGMODE negGenModeHM//coll(0) ,NonRel(1)
 #define FBMODE feedbackMode//NoFB(0),NonRel(1),Normal(2)
 #define UPDTHRMODE updatingThresholdMode//No(0),Linear(1) ,Diff(2)
 
     cout<< "RSMethod: "<<RSMethodHM<<" NegGenMode: "<<negGenModeHM<<" feedbackMode: "<<feedbackMode<<" updatingThrMode: "<<updatingThresholdMode<<"\n";
-
-
-#if RETMODE == 0 
     double start_thresh =startThresholdHM, end_thresh= endThresholdHM;
     double start_negMu =startNegMu, end_negMu= endNegMu;
     double start_delta =startDelta, end_delta= endDelta;
 
+
+#if !FBMODE && !UPDTHRMODE
     for (double thresh = start_thresh ; thresh<=end_thresh ; thresh += intervalThresholdHM)
     {
-#if 1
         myMethod->setThreshold(thresh);
+
+
+#if 1
         for (double delta = start_delta ; delta<=end_delta ; delta += deltaInterval)
         {
             myMethod->setDelta(delta);
@@ -141,246 +143,248 @@ void computeRSMethods(Index* ind)
             myMethod->setNegMu(2500);
 #endif
 #if 0
-        myMethod->setThreshold(thresh);
-        for (double negmu = start_negMu ; negmu<=end_negMu ; negmu += NegMuInterval)
-    	{
-    		myMethod->setNegMu(negmu);
-    		resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(negmu)+".res";
+            for (double negmu = start_negMu ; negmu<=end_negMu ; negmu += NegMuInterval)
+            {
+                myMethod->setNegMu(negmu);
+                resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(negmu)+".res";
+#endif
 #endif
 
-#endif
 
-#if RETMODE == 1 && NEGMODE == 0
-        double start_negThr = startNegWeight , end_negThr = endNegWeight;
-        for (double neg = start_negThr ; neg<=end_negThr ; neg += negWeightInterval)
-        {
-            myMethod->setNegWeight(neg);
-            out<<"negWeight: "<<myMethod->getNegWeight()<<endl;
-            resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(neg)+".res";
+#if RETMODE == 1 && FBMODE == 1
+                double start_negThr = startNegWeight , end_negThr = endNegWeight;
+                for (double neg = start_negThr ; neg<=end_negThr ; neg += negWeightInterval)
+                {
+                    myMethod->setNegWeight(neg);
+                    out<<"negWeight: "<<myMethod->getNegWeight()<<endl;
+                    resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(neg)+".res";
 
 #endif
 
 #if UPDTHRMODE == 1
 
-            for(double c1 = 0.1 ; c1<=3 ;c1+=0.1)//inc
-            {
-                myMethod->setC1(c1);
-                for(double c2 = 0.1 ; c2 <= 4 ; c2+=0.2)//dec
-                {
-                    myMethod->setThreshold(-6.3);
-                    myMethod->setC2(c2);
-
-                    for(int numOfShownNonRel =1;numOfShownNonRel< 30;numOfShownNonRel+=1 )
+                    for(double c1 = 0.1 ; c1<=3 ;c1+=0.1)//inc
                     {
-
-                        for(int numOfnotShownDoc = 20 ;numOfnotShownDoc <= 800 ; numOfnotShownDoc+=20)
+                        myMethod->setC1(c1);
+                        for(double c2 = 0.1 ; c2 <= 4 ; c2+=0.2)//dec
                         {
                             myMethod->setThreshold(-6.3);
-                            cout<<"c1: "<<c1<<" c2: "<<c2<<" numOfShownNonRel: "<<numOfShownNonRel<<" numOfnotShownDoc: "<<numOfnotShownDoc<<" "<<endl;
-                            resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_c1:"+numToStr(c1)+"_c2:"+numToStr(c2)+"_#showNonRel:"+numToStr(numOfShownNonRel)+"_#notShownDoc:"+numToStr(numOfnotShownDoc)+".res";
+                            myMethod->setC2(c2);
+
+                            for(int numOfShownNonRel =1;numOfShownNonRel< 30;numOfShownNonRel+=1 )
+                            {
+
+                                for(int numOfnotShownDoc = 20 ;numOfnotShownDoc <= 800 ; numOfnotShownDoc+=20)
+                                {
+                                    myMethod->setThreshold(-6.3);
+                                    cout<<"c1: "<<c1<<" c2: "<<c2<<" numOfShownNonRel: "<<numOfShownNonRel<<" numOfnotShownDoc: "<<numOfnotShownDoc<<" "<<endl;
+                                    resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_c1:"+numToStr(c1)+"_c2:"+numToStr(c2)+"_#showNonRel:"+numToStr(numOfShownNonRel)+"_#notShownDoc:"+numToStr(numOfnotShownDoc)+".res";
 #endif
 
 #if UPDTHRMODE == 2
-                            for(double alph = 0.1 ; alph <= 1.0 ; alph+=0.1)
-                            {
-                                myMethod->setDiffThrUpdatingParam(alph);
-                                out<<"diff_alpha: "<<myMethod->getDiffThrUpdatingParam()<<endl;
-                                resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_alpha:"+numToStr(alph)+".res";
+                                    for(double alph = 0.1 ; alph <= 1.0 ; alph+=0.1)
+                                    {
+                                        myMethod->setDiffThrUpdatingParam(alph);
+                                        out<<"diff_alpha: "<<myMethod->getDiffThrUpdatingParam()<<endl;
+                                        resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_alpha:"+numToStr(alph)+".res";
 #endif
 
 
-                                IndexedRealVector results;
-                                out<<"threshold: "<<myMethod->getThreshold()<< " negmu: "<<myMethod->getNegMu();
-                                out<<" delta: "<<myMethod->getDelta()<<endl;
+                                        IndexedRealVector results;
+                                        out<<"threshold: "<<myMethod->getThreshold()<< " negmu: "<<myMethod->getNegMu();
+                                        out<<" delta: "<<myMethod->getDelta()<<endl;
 
-                                qs->startDocIteration();
-                                TextQuery *q;
+                                        qs->startDocIteration();
+                                        TextQuery *q;
 
-                                ofstream result(resultPath.c_str());
-                                ResultFile resultFile(1);
-                                resultFile.openForWrite(result,*ind);
+                                        ofstream result(resultPath.c_str());
+                                        ResultFile resultFile(1);
+                                        resultFile.openForWrite(result,*ind);
 
-                                double relRetCounter = 0 , retCounter = 0 , relCounter = 0;
-                                vector<double> queriesPrecision,queriesRecall;
-                                while(qs->hasMore())
-                                {
-#if UPDTHRMODE != 0
-                                    myMethod->setThreshold(-6.3 FIXME!!!!);
-#endif
-
-
-                                    double relSumScores =0.0,nonRelSumScores = 0.0;
-
-                                    int numberOfNotShownDocs = 0,numberOfShownNonRelDocs = 0;
-
-                                    vector<int> relJudgDocs,nonRelJudgDocs;
-                                    results.clear();
-
-
-                                    Document* d = qs->nextDoc();
-                                    q = new TextQuery(*d);
-                                    QueryRep *qr = myMethod->computeQueryRep(*q);
-                                    cout<<"qid: "<<q->id()<<endl;
-
-                                    bool newNonRel = false;
-                                    vector<string> relDocs;
-
-                                    if( queryRelDocsMap.find(q->id()) != queryRelDocsMap.end() )//find it!
-                                        relDocs = queryRelDocsMap[q->id()];
-                                    else
-                                    {
-                                        cerr<<"*******relSize**********\n";
-                                        continue;
-                                    }
-
-                                    //for(int docID = 1 ; docID < ind->docCount() ; docID++){ //compute for all doc
-                                    vector <int> docids = queryDocList(ind,((TextQueryRep *)(qr)));
-
-
-                                    for(int i = 0 ; i<docids.size(); i++) //compute for docs which have queryTerm
-                                    {
-                                        int docID = docids[i];
-
-                                        float sim = myMethod->computeProfDocSim(((TextQueryRep *)(qr)) ,docID, relJudgDocs , nonRelJudgDocs , newNonRel);
-
-                                        if(sim >=  myMethod->getThreshold() )
+                                        double relRetCounter = 0 , retCounter = 0 , relCounter = 0;
+                                        vector<double> queriesPrecision,queriesRecall;
+                                        while(qs->hasMore())
                                         {
-                                            numberOfNotShownDocs=0;
+#if UPDTHRMODE != 0
+                                            myMethod->setThreshold(-6.3 FIXME!!!!);
+#endif
 
-                                            bool isRel = false;
-                                            for(int i = 0 ; i < relDocs.size() ; i++)
+
+                                            double relSumScores =0.0,nonRelSumScores = 0.0;
+
+                                            int numberOfNotShownDocs = 0,numberOfShownNonRelDocs = 0;
+
+                                            vector<int> relJudgDocs,nonRelJudgDocs;
+                                            results.clear();
+
+
+                                            Document* d = qs->nextDoc();
+                                            q = new TextQuery(*d);
+                                            QueryRep *qr = myMethod->computeQueryRep(*q);
+                                            cout<<"qid: "<<q->id()<<endl;
+
+                                            bool newNonRel = false;
+                                            vector<string> relDocs;
+
+                                            if( queryRelDocsMap.find(q->id()) != queryRelDocsMap.end() )//find it!
+                                                relDocs = queryRelDocsMap[q->id()];
+                                            else
                                             {
-                                                if(relDocs[i] == ind->document(docID) )
+                                                cerr<<"*******relSize**********\n";
+                                                continue;
+                                            }
+
+                                            //for(int docID = 1 ; docID < ind->docCount() ; docID++){ //compute for all doc
+                                            vector <int> docids = queryDocList(ind,((TextQueryRep *)(qr)));
+
+
+                                            for(int i = 0 ; i<docids.size(); i++) //compute for docs which have queryTerm
+                                            {
+                                                int docID = docids[i];
+
+                                                float sim = myMethod->computeProfDocSim(((TextQueryRep *)(qr)) ,docID, relJudgDocs , nonRelJudgDocs , newNonRel);
+
+                                                if(sim >=  myMethod->getThreshold() )
                                                 {
-                                                    isRel = true;
-                                                    newNonRel = false;
-                                                    relJudgDocs.push_back(docID);
+                                                    numberOfNotShownDocs=0;
 
-                                                    relSumScores+=sim;
+                                                    bool isRel = false;
+                                                    for(int i = 0 ; i < relDocs.size() ; i++)
+                                                    {
+                                                        if(relDocs[i] == ind->document(docID) )
+                                                        {
+                                                            isRel = true;
+                                                            newNonRel = false;
+                                                            relJudgDocs.push_back(docID);
 
-                                                    break;
-                                                }
-                                            }
-                                            if(!isRel)
-                                            {
-                                                nonRelJudgDocs.push_back(docID);
-                                                newNonRel = true;
+                                                            relSumScores+=sim;
 
-                                                nonRelSumScores+=sim;
-                                                numberOfShownNonRelDocs++;
-                                            }
-                                            results.PushValue(docID , sim);
+                                                            break;
+                                                        }
+                                                    }
+                                                    if(!isRel)
+                                                    {
+                                                        nonRelJudgDocs.push_back(docID);
+                                                        newNonRel = true;
+
+                                                        nonRelSumScores+=sim;
+                                                        numberOfShownNonRelDocs++;
+                                                    }
+                                                    results.PushValue(docID , sim);
 
 #if FBMODE
-                                            myMethod->updateProfile(*((TextQueryRep *)(qr)),relJudgDocs , nonRelJudgDocs );
-                                            /*if (results.size() %20 == 0 && feedbackMode > 0)
+                                                    myMethod->updateProfile(*((TextQueryRep *)(qr)),relJudgDocs , nonRelJudgDocs );
+                                                    /*if (results.size() %20 == 0 && feedbackMode > 0)
                     {
                         //cout<<"Updating profile. Result size: "<<results.size()<<endl;
                         myMethod->updateProfile(*((TextQueryRep *)(qr)),relJudgDocs , nonRelJudgDocs );
                     }*/
 #endif
 #if UPDTHRMODE == 1
-                                            if(!isRel)
-                                                if( numberOfShownNonRelDocs == numOfShownNonRel )
+                                                    if(!isRel)
+                                                        if( numberOfShownNonRelDocs == numOfShownNonRel )
+                                                        {
+                                                            myMethod->updateThreshold(*((TextQueryRep *)(qr)), relJudgDocs , nonRelJudgDocs ,0,relSumScores,nonRelSumScores);//inc thr
+                                                            numberOfShownNonRelDocs =0;
+                                                        }
+#endif
+
+#if UPDTHRMODE == 2
+                                                    if(!isRel)//FIXME!!!
+                                                        myMethod->updateThreshold(*((TextQueryRep *)(qr)), relJudgDocs , nonRelJudgDocs ,0,relSumScores,nonRelSumScores);//inc thr
+#endif
+
+
+                                                }
+                                                else
                                                 {
-                                                    myMethod->updateThreshold(*((TextQueryRep *)(qr)), relJudgDocs , nonRelJudgDocs ,0,relSumScores,nonRelSumScores);//inc thr
-                                                    numberOfShownNonRelDocs =0;
+                                                    newNonRel = false;
+                                                    numberOfNotShownDocs++;
+                                                }
+#if UPDTHRMODE == 1
+                                                if(numberOfNotShownDocs == numOfnotShownDoc)//not show anything after |numOfnotShownDoc| docs! -->dec(thr)
+                                                {
+                                                    myMethod->updateThreshold(*((TextQueryRep *)(qr)), relJudgDocs , nonRelJudgDocs ,1,relSumScores,nonRelSumScores);//dec thr
+                                                    numberOfNotShownDocs = 0;
                                                 }
 #endif
 
 #if UPDTHRMODE == 2
-                                            if(!isRel)//FIXME!!!
-                                                myMethod->updateThreshold(*((TextQueryRep *)(qr)), relJudgDocs , nonRelJudgDocs ,0,relSumScores,nonRelSumScores);//inc thr
+                                                if(numberOfNotShownDocs==100)//FIXME!!!!
+                                                    myMethod->updateThreshold(*((TextQueryRep *)(qr)), relJudgDocs , nonRelJudgDocs ,1,relSumScores,nonRelSumScores);//dec thr
 #endif
 
+                                            }//endfor docs
 
-                                        }
-                                        else
+                                            results.Sort();
+                                            resultFile.writeResults(q->id() ,&results,results.size());
+                                            relRetCounter += relJudgDocs.size();
+                                            retCounter += results.size();
+                                            relCounter += relDocs.size();
+
+                                            if(results.size() != 0)
+                                            {
+                                                queriesPrecision.push_back((double)relJudgDocs.size() / results.size());
+                                                queriesRecall.push_back((double)relJudgDocs.size() / relDocs.size() );
+                                            }else // have no suggestion for this query
+                                            {
+                                                queriesPrecision.push_back(0.0);
+                                                queriesRecall.push_back(0.0);
+                                            }
+
+
+                                            //break;
+                                            delete q;
+                                            delete qr;
+
+                                        }//end queries
+
+
+                                        double avgPrec = 0.0 , avgRecall = 0.0;
+                                        for(int i = 0 ; i < queriesPrecision.size() ; i++)
                                         {
-                                            newNonRel = false;
-                                            numberOfNotShownDocs++;
+                                            avgPrec+=queriesPrecision[i];
+                                            avgRecall+= queriesRecall[i];
+                                            out<<"Prec["<<i<<"] = "<<queriesPrecision[i]<<"\tRecall["<<i<<"] = "<<queriesRecall[i]<<endl;
                                         }
-#if UPDTHRMODE == 1
-                                        if(numberOfNotShownDocs == numOfnotShownDoc)//not show anything after |numOfnotShownDoc| docs! -->dec(thr)
-                                        {
-                                            myMethod->updateThreshold(*((TextQueryRep *)(qr)), relJudgDocs , nonRelJudgDocs ,1,relSumScores,nonRelSumScores);//dec thr
-                                            numberOfNotShownDocs = 0;
-                                        }
-#endif
-
-#if UPDTHRMODE == 2
-                                        if(numberOfNotShownDocs==100)//FIXME!!!!
-                                            myMethod->updateThreshold(*((TextQueryRep *)(qr)), relJudgDocs , nonRelJudgDocs ,1,relSumScores,nonRelSumScores);//dec thr
-#endif
-
-                                    }//endfor docs
-
-                                    results.Sort();
-                                    resultFile.writeResults(q->id() ,&results,results.size());
-                                    relRetCounter += relJudgDocs.size();
-                                    retCounter += results.size();
-                                    relCounter += relDocs.size();
-
-                                    if(results.size() != 0)
-                                    {
-                                        queriesPrecision.push_back((double)relJudgDocs.size() / results.size());
-                                        queriesRecall.push_back((double)relJudgDocs.size() / relDocs.size() );
-                                    }else // have no suggestion for this query
-                                    {
-                                        queriesPrecision.push_back(0.0);
-                                        queriesRecall.push_back(0.0);
-                                    }
-
-
-                                    //break;
-                                    delete q;
-                                    delete qr;
-
-                                }//end queries
-
-
-                                double avgPrec = 0.0 , avgRecall = 0.0;
-                                for(int i = 0 ; i < queriesPrecision.size() ; i++)
-                                {
-                                    avgPrec+=queriesPrecision[i];
-                                    avgRecall+= queriesRecall[i];
-                                    out<<"Prec["<<i<<"] = "<<queriesPrecision[i]<<"\tRecall["<<i<<"] = "<<queriesRecall[i]<<endl;
-                                }
-                                avgPrec/=queriesPrecision.size();
-                                avgRecall/=queriesRecall.size();
+                                        avgPrec/=queriesPrecision.size();
+                                        avgRecall/=queriesRecall.size();
 
 #if UPDTHRMODE == 1
-                                out<<"C1: "<< c1<<"\nC2: "<<c2<<endl;
-                                out<<"numOfShownNonRel: "<<numOfShownNonRel<<"\nnumOfnotShownDoc: "<<numOfnotShownDoc<<endl;
+                                        out<<"C1: "<< c1<<"\nC2: "<<c2<<endl;
+                                        out<<"numOfShownNonRel: "<<numOfShownNonRel<<"\nnumOfnotShownDoc: "<<numOfnotShownDoc<<endl;
 #endif
-                                out<<"Avg Precision: "<<avgPrec<<endl;
-                                out<<"Avg Recall: "<<avgRecall<<endl;
-                                out<<"F-measure: "<<(2*avgPrec*avgRecall)/(avgPrec+avgRecall)<<endl<<endl;
+                                        out<<"Avg Precision: "<<avgPrec<<endl;
+                                        out<<"Avg Recall: "<<avgRecall<<endl;
+                                        out<<"F-measure: "<<(2*avgPrec*avgRecall)/(avgPrec+avgRecall)<<endl<<endl;
 
 
-                                //break;
-                                //if(feedbackMode == 0)//no fb
-                                //    break;
-                                //if(numberOfQueries==2)//????????????????????????????????????????????????????????
-                                //    break;
+                                        //break;
+                                        //if(feedbackMode == 0)//no fb
+                                        //    break;
+                                        //if(numberOfQueries==2)//????????????????????????????????????????????????????????
+                                        //    break;
 
 #if RETMODE == 0
-                            }//end for_thr
-                        }
+                                    }//end for_thr
+                                }
 #endif
-
+#if RETMODE == 1 && FBMODE == 1
+                            }
+#endif
 
 #if UPDTHRMODE == 1
-                        }//end numOfnotShownDoc for
-                    }//end numOfShownNonRel for
-                }//end c1 for
-            }//end c2 for
+                            }//end numOfnotShownDoc for
+                        }//end numOfShownNonRel for
+                    }//end c1 for
+                }//end c2 for
 #endif
 #if UPDTHRMODE == 2
-        }//end alpha for
+            }//end alpha for
 #endif
 
-#if RETMODE == 1 && NEGMODE == 0
+#if !FBMODE && !UPDTHRMODE
+        }
     }
 #endif
     delete qs;
