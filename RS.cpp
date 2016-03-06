@@ -111,18 +111,18 @@ void computeRSMethods(Index* ind)
     ofstream out(outFilename.c_str());
 
 
-/*
+
 #define RETMODE 1//LM(0) ,RS(1)
     //#define NEGMODE 0//coll(0) ,NonRel(1)
 #define FBMODE 0//NoFB(0),NonRel(1),Normal(2)
 #define UPDTHRMODE 0//No(0),Linear(1) ,Diff(2)
-*/
 
+/*
 #define RETMODE RSMethodHM//LM(0) ,RS(1)
 //#define NEGMODE negGenModeHM//coll(0) ,NonRel(1)
 #define FBMODE feedbackMode//NoFB(0),NonRel(1),Normal(2)
 #define UPDTHRMODE updatingThresholdMode//No(0),Linear(1) ,Diff(2)
-
+*/
     cout<< "RSMethod: "<<RSMethodHM<<" NegGenMode: "<<negGenModeHM<<" feedbackMode: "<<feedbackMode<<" updatingThrMode: "<<updatingThresholdMode<<"\n";
     double start_thresh =startThresholdHM, end_thresh= endThresholdHM;
     double start_negMu =startNegMu, end_negMu= endNegMu;
@@ -365,10 +365,6 @@ void computeRSMethods(Index* ind)
                                         //if(numberOfQueries==2)//????????????????????????????????????????????????????????
                                         //    break;
 
-#if RETMODE == 0
-                                    }//end for_thr
-                                }
-#endif
 #if RETMODE == 1 && FBMODE == 1
                             }
 #endif
