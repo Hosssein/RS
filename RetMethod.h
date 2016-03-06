@@ -169,7 +169,7 @@ public:
             }
             */
             //cout<<readedDelta<<"\n";
-            double mu=negGenMUHM;//2500;
+            double mu= ind.docLengthAvg();//negGenMUHM;//2500;
             negQueryGen =0;
             //   if(negQueryGen == 0)
             // {
@@ -214,7 +214,7 @@ public:
             if (newNonRel)
                 DNsize += ind.docLength(JudgDocs[JudgDocs.size()-1]);
 
-            double mu=negGenMUHM;//2500;
+            double mu= ind.docLengthAvg();//negGenMUHM;//2500;
             negQueryGen =0;
             //if(negQueryGen == 0)
             //{
