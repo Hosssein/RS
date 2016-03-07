@@ -288,6 +288,9 @@ public:
             int freq=0 ;
             hfv.find(qt->id(),freq);
             cwdbar = countInNonRel[qt->id()];
+            //Query Term Elimination
+            if (freq > 0)
+                cwdbar = 0;
             lemur::api::TERMID_T id = qt->id();
 
             lemur::api::COUNT_T qtcf = ind.termCount(id);

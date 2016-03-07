@@ -145,7 +145,7 @@ void readParamFile(string paramfileName)
         iss>>endDelta;
 
         iss.clear();
-        iss.str( topic->child("deltaInterval").first_child().value());
+        iss.str( topic->child("DeltaInterval").first_child().value());
         iss>>deltaInterval;
 
         iss.clear();
