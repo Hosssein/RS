@@ -381,6 +381,7 @@ void computeRSMethods(Index* ind)
 
 #if !FBMODE && !UPDTHRMODE
         }
+	}
     }
 #endif
     delete qs;
