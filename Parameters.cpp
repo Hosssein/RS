@@ -58,8 +58,8 @@ void readParams(string paramFileName)
         resultFileNameHM += "res/LM_";
     }
     else if(RSMethodHM == 2){
-        outputFileNameHM += "out/NegKL_";
-        resultFileNameHM += "res/NegKL_";
+        outputFileNameHM += "out/NegKLQTE_";
+        resultFileNameHM += "res/NegKLQTE_";
 
     }
 
