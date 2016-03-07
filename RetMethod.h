@@ -310,8 +310,8 @@ public:
         if (newNonRel)
             delete hfv2;
         //}
-            cout<<"Did: "<<dRep->getID()<<endl;
-          cout<<"DNsize: "<<DNsize<<"\nnegQueryGen: "<<negQueryGen<<endl<<endl;
+        //    cout<<"Did: "<<dRep->getID()<<endl;
+        //  cout<<"DNsize: "<<DNsize<<"\nnegQueryGen: "<<negQueryGen<<endl<<endl;
         return negQueryGen;
 
 
