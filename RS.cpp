@@ -142,7 +142,7 @@ void computeRSMethods(Index* ind)
             resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(delta)+".res";
             myMethod->setNegMu(2500);
 #endif
-#if 0
+#if 1
             for (double negmu = start_negMu ; negmu<=end_negMu ; negmu += NegMuInterval)
             {
                 myMethod->setNegMu(negmu);
@@ -381,6 +381,7 @@ void computeRSMethods(Index* ind)
 
 #if !FBMODE && !UPDTHRMODE
         }
+	}
     }
 #endif
     delete qs;
