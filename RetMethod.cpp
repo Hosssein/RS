@@ -636,8 +636,8 @@ void lemur::retrieval::RetMethod::updateThreshold(lemur::api::TextQueryRep &orig
                 if (feedbackMode ==4){ 
                    prTopic = (1-noisePr)*distQuery[wd]/
                         ((1-noisePr)*distQuery[wd]+noisePr*(0.01*collectLM->prob(wd)+0.99*nonRelLM->prob(wd)));
-                        cout<<nonRelLM->prob(wd)<<endl;
-                        cout<<collectLM->prob(wd)<<endl;
+                        //cout<<nonRelLM->prob(wd)<<endl;
+                        //cout<<collectLM->prob(wd)<<endl;
                 }
                 else
                     prTopic = (1-noisePr)*distQuery[wd]/
