@@ -120,7 +120,7 @@ void computeRSMethods(Index* ind)
 
 #define RETMODE RSMethodHM//LM(0) ,RS(1)
 //#define NEGMODE negGenModeHM//coll(0) ,NonRel(1)
-#define FBMODE feedbackMode//NoFB(0),NonRel(1),Normal(2)
+#define FBMODE feedbackMode//NoFB(0),NonRel(1),Normal(2),Mixture(3)
 #define UPDTHRMODE updatingThresholdMode//No(0),Linear(1) ,Diff(2)
 
     cout<< "RSMethod: "<<RSMethodHM<<" NegGenMode: "<<negGenModeHM<<" feedbackMode: "<<feedbackMode<<" updatingThrMode: "<<updatingThresholdMode<<"\n";

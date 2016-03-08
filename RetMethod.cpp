@@ -210,8 +210,8 @@ lemur::retrieval::RetMethod::RetMethod(const Index &dbIndex,
 
 
     
-    qryParam.fbMethod = RetParameter::RM1;
-    RM="RM1";// *** Query Likelihood adjusted score method *** //
+    qryParam.fbMethod = RetParameter::MIXTURE;
+    RM="MIX";// *** Query Likelihood adjusted score method *** //
     //qryParam.fbCoeff = RetParameter::defaultFBCoeff;
     qryParam.fbCoeff =0.5;
     qryParam.fbPrTh = RetParameter::defaultFBPrTh;

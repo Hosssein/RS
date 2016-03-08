@@ -26,7 +26,7 @@ double startDelta, endDelta, deltaInterval;
 int RSMethodHM; // 0--> LM , 1--> RecSys
 int negGenModeHM;//0 --> coll , 1--> nonRel
 
-int feedbackMode;//0 --> no fb, 1-->ours , 2-->normal
+int feedbackMode;//0 --> no fb, 1-->ours , 2-->normal , 3-->mixture
 
 int updatingThresholdMode;//0 -> no updating, 1->linear , 2->diffAlpha
 
@@ -75,6 +75,11 @@ void readParams(string paramFileName)
     {
         outputFileNameHM+="NormalFB_";
         resultFileNameHM += "NormalFB_";
+    }
+    else if(feedbackMode == 3)//mixture feedback
+    {
+        outputFileNameHM+="MixtureFB_";
+        resultFileNameHM += "MixtureFB_";
     }
 
     if(updatingThresholdMode == 0)//no updating
