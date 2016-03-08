@@ -81,6 +81,11 @@ void readParams(string paramFileName)
         outputFileNameHM+="MixtureFB_";
         resultFileNameHM += "MixtureFB_";
     }
+    else if(feedbackMode == 4)//mixture feedback
+    {
+        outputFileNameHM+="NegMixtureFB_";
+        resultFileNameHM += "NegMixtureFB_";
+    }
 
     if(updatingThresholdMode == 0)//no updating
     {

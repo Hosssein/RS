@@ -583,7 +583,7 @@ protected:
     //@{
     /// Mixture model feedback method
     void computeMixtureFBModel(QueryModel &origRep,
-                               const lemur::api::DocIDSet & relDocs);
+                               const lemur::api::DocIDSet & relDocs, const lemur::api::DocIDSet &nonRelDocs);
     /// Divergence minimization feedback method
     void computeDivMinFBModel(QueryModel &origRep,
                               const lemur::api::DocIDSet &relDocs);

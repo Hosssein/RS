@@ -271,8 +271,10 @@ void computeRSMethods(Index* ind)
                                                         numberOfShownNonRelDocs++;
                                                     }
                                                     results.PushValue(docID , sim);
+                                                  //  cout<<"miad???"<<FBMODE<<endl;
 
-#if FBMODE
+#if FBMODE == 3 || FBMODE == 4
+                                                 //   cout<<"miad?"<<endl;
                                                     myMethod->updateProfile(*((TextQueryRep *)(qr)),relJudgDocs , nonRelJudgDocs );
                                                     /*if (results.size() %20 == 0 && feedbackMode > 0)
                     {
