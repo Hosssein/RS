@@ -119,11 +119,12 @@ void computeRSMethods(Index* ind)
 */
 
 #define RETMODE RSMethodHM//LM(0) ,RS(1)
-//#define NEGMODE negGenModeHM//coll(0) ,NonRel(1)
+#define NEGMODE negGenModeHM//coll(0) ,NonRel(1)
 #define FBMODE feedbackMode//NoFB(0),NonRel(1),Normal(2),Mixture(3)
 #define UPDTHRMODE updatingThresholdMode//No(0),Linear(1) ,Diff(2)
 
     cout<< "RSMethod: "<<RSMethodHM<<" NegGenMode: "<<negGenModeHM<<" feedbackMode: "<<feedbackMode<<" updatingThrMode: "<<updatingThresholdMode<<"\n";
+    cout<< "RSMethod: "<<RETMODE<<" NegGenMode: "<<NEGMODE<<" feedbackMode: "<<FBMODE<<" updatingThrMode: "<<UPDTHRMODE<<"\n";
     double start_thresh =startThresholdHM, end_thresh= endThresholdHM;
     double start_negMu =startNegMu, end_negMu= endNegMu;
     double start_delta =startDelta, end_delta= endDelta;
@@ -134,20 +135,17 @@ void computeRSMethods(Index* ind)
     {
         myMethod->setThreshold(thresh);
 
-
-#if 1
         for (double delta = start_delta ; delta<=end_delta ; delta += deltaInterval)
         {
             myMethod->setDelta(delta);
             resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(delta)+".res";
             myMethod->setNegMu(2500);
-#endif
-#if 1
+
             for (double negmu = start_negMu ; negmu<=end_negMu ; negmu += NegMuInterval)
             {
                 myMethod->setNegMu(negmu);
                 resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(negmu)+".res";
-#endif
+
 #endif
 
 
@@ -244,8 +242,10 @@ void computeRSMethods(Index* ind)
 
                                                 float sim = myMethod->computeProfDocSim(((TextQueryRep *)(qr)) ,docID, relJudgDocs , nonRelJudgDocs , newNonRel);
 
+
                                                 if(sim >=  myMethod->getThreshold() )
                                                 {
+
                                                     numberOfNotShownDocs=0;
 
                                                     bool isRel = false;
@@ -271,10 +271,10 @@ void computeRSMethods(Index* ind)
                                                         numberOfShownNonRelDocs++;
                                                     }
                                                     results.PushValue(docID , sim);
-                                                  //  cout<<"miad???"<<FBMODE<<endl;
 
-#if FBMODE == 3 || FBMODE == 4
-                                                 //   cout<<"miad?"<<endl;
+
+#if 1//FBMODE
+
                                                     myMethod->updateProfile(*((TextQueryRep *)(qr)),relJudgDocs , nonRelJudgDocs );
                                                     /*if (results.size() %20 == 0 && feedbackMode > 0)
                     {
@@ -383,7 +383,7 @@ void computeRSMethods(Index* ind)
 
 #if !FBMODE && !UPDTHRMODE
         }
-	}
+    }
     }
 #endif
     delete qs;
