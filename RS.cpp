@@ -273,7 +273,7 @@ void computeRSMethods(Index* ind)
                                                     results.PushValue(docID , sim);
 
 
-#if 1//FBMODE
+#if 0//FBMODE
 
                                                     myMethod->updateProfile(*((TextQueryRep *)(qr)),relJudgDocs , nonRelJudgDocs );
                                                     /*if (results.size() %20 == 0 && feedbackMode > 0)

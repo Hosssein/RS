@@ -28,6 +28,7 @@
 
 
 extern double negGenMUHM;
+extern int RSMethodHM;
 
 namespace lemur 
 {
@@ -289,8 +290,10 @@ public:
             hfv.find(qt->id(),freq);
             cwdbar = countInNonRel[qt->id()];
             //Query Term Elimination
-            if (freq > 0)
+            if (RSMethodHM==2 && freq > 0){
+                //cout<<"miad!"<<endl;
                 cwdbar = 0;
+            }
             lemur::api::TERMID_T id = qt->id();
 
             lemur::api::COUNT_T qtcf = ind.termCount(id);

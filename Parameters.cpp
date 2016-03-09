@@ -62,7 +62,11 @@ void readParams(string paramFileName)
         resultFileNameHM += "res/NegKLQTE_";
 
     }
+    else if(RSMethodHM == 3){
+        outputFileNameHM += "out/NegKL_";
+        resultFileNameHM += "res/NegKL_";
 
+    }
     if(feedbackMode == 0)//no fb
     {
         outputFileNameHM+="Nofb_";
