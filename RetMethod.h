@@ -220,13 +220,12 @@ public:
                     countInNonRel[qt->id()] += freq;
                 }
                 double cwdbar = 0;
-                /*
+
                 int freq=0 ;
                 hfv.find(qt->id(),freq);
                 if(freq>0)
                     cwdbar = 0;
                 else
-                */
                 {
                     /*for (int i = 0 ; i<JudgDocs.size() ; i++){
                             lemur::utility::HashFreqVector hfv(ind,JudgDocs[i]);
@@ -239,6 +238,8 @@ public:
                 lemur::api::TERMID_T id = qt->id();
 
                 lemur::api::COUNT_T qtcf = ind.termCount(id);
+
+                DNsize = countInNonRel.size();//????????????????????????????????????
 
                 double pwc = (double)qtcf/(double)tc;
                 double pwdbar = (cwdbar/(DNsize+mu))+((mu*pwc)/(DNsize+mu));
