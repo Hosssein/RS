@@ -118,7 +118,7 @@ void computeRSMethods(Index* ind)
 #define UPDTHRMODE 0//No(0),Linear(1) ,Diff(2)
 */
 
-#define RETMODE RSMethodHM//LM(0) ,RS(1)
+#define RETMODE RSMethodHM//LM(0) ,RS(1), NegKLQTE(2),NegKL(3)
 #define NEGMODE negGenModeHM//coll(0) ,NonRel(1)
 #define FBMODE feedbackMode//NoFB(0),NonRel(1),Normal(2),Mixture(3)
 #define UPDTHRMODE updatingThresholdMode//No(0),Linear(1) ,Diff(2)

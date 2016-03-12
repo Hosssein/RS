@@ -439,16 +439,8 @@ void lemur::retrieval::RetMethod::updateThreshold(lemur::api::TextQueryRep &orig
     float lemur::retrieval::RetMethod::computeProfDocSim(lemur::api::TextQueryRep *textQR,int docID ,
                                                          vector<int> relJudgDoc ,vector<int> nonReljudgDoc , bool newNonRel)
     {
-        if(0)
-        {
-            /*
-            const QueryModel *qm = dynamic_cast<const QueryModel *>(textQR);
-            double sc = qm->interpolateSimsScore(textQR,docID ,relJudgDoc , nonReljudgDoc , newNonRel);
-            return sc;
-            */
 
-        }else
-        {
+
             const QueryModel *qm = dynamic_cast<const QueryModel *>(textQR);
 
             double sc = 0;
@@ -482,7 +474,7 @@ void lemur::retrieval::RetMethod::updateThreshold(lemur::api::TextQueryRep &orig
             {
                 negQueryGenerationScore= qm->negativeQueryGeneration(dRep ,nonReljudgDoc ,negGenModeHM, newNonRel,NegMu,delta);
             }
-            else if (RSMethodHM == 2 || RSMethodHM == 3)//RecSys negKL and negKLQTE
+            else if (RSMethodHM == 2 || RSMethodHM == 3)//RecSys negKLQTE(2) and negKL(3)
             {    
                 negQueryGenerationScore = qm->negativeKL(dRep ,nonReljudgDoc , newNonRel,NegMu);
             }
@@ -491,7 +483,7 @@ void lemur::retrieval::RetMethod::updateThreshold(lemur::api::TextQueryRep &orig
 
             delete dRep;
             return negQueryGenerationScore + adjustedScore;
-        }
+
 
     }
 

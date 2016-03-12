@@ -220,11 +220,13 @@ public:
                     countInNonRel[qt->id()] += freq;
                 }
                 double cwdbar = 0;
+                /*
                 int freq=0 ;
                 hfv.find(qt->id(),freq);
                 if(freq>0)
                     cwdbar = 0;
                 else
+                */
                 {
                     /*for (int i = 0 ; i<JudgDocs.size() ; i++){
                             lemur::utility::HashFreqVector hfv(ind,JudgDocs[i]);
@@ -278,7 +280,7 @@ public:
         {
 
             lemur::api::QueryTerm *qt = nextTerm();
-            double pwq = qt->weight()/totalCount();
+            double pwq = qt->weight()/totalCount();//????????????????????????????????????????
             if (newNonRel)
             {
                 int freq;
