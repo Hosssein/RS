@@ -19,7 +19,11 @@ void k_fold_cross_validation(int k, int q_num, string filePath){
 	int fold = q_num/k;
 	//double thr;
 	string thr;
-	
+
+	string oo = filePath+"_cv";
+
+	ofstream out(oo.c_str());
+
 	map<string, map<int,double> >avg_fold_prec,avg_fold_recall,avg_fold_f_measure;
 	map<string, map<int,vector <double> > >thr_prec,thr_recall,thr_f_measure;
 	map<int,double>fold_size;
@@ -153,15 +157,16 @@ void k_fold_cross_validation(int k, int q_num, string filePath){
 	cout<<"recall: "<<final_recall<<endl;*/
 	double final_f_measure = (avg_fold_f_measure[max_f_measure_thr[1]][0] * fold_size[0]) + (avg_fold_f_measure[max_f_measure_thr[0]][1] * fold_size[1]);
 	//cout<<fold_size[0]<<" "<<fold_size[1]<<endl;
+	out<<max_f_measure_thr[0]<<"\n"<<max_f_measure_thr[1]<<endl;
 	for(int i = 0 ; i<fold_size[0];i++){
-		cout<<thr_f_measure[max_f_measure_thr[1]][0][i]<<endl;
+		out<<thr_f_measure[max_f_measure_thr[1]][0][i]<<endl;
 	}
 	for(int i = 0 ; i<fold_size[1];i++){
-		cout<<thr_f_measure[max_f_measure_thr[0]][1][i]<<endl;
+		out<<thr_f_measure[max_f_measure_thr[0]][1][i]<<endl;
 	}
 
 	final_f_measure /= (double)q_num;
-	cout<<"f_measure: "<<final_f_measure<<endl;
+	out<<"f_measure: "<<final_f_measure<<endl;
 }
 
 
