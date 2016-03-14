@@ -24,6 +24,7 @@ void k_fold_cross_validation(int k, int q_num, string filePath){
 	map<string, map<int,vector <double> > >thr_prec,thr_recall,thr_f_measure;
 	map<int,double>fold_size;
 	while(getline(in,thr)){
+		int counter = 0;
 		map<int,vector <double> >fold_prec,fold_recall,fold_f_measure;
 		//getline(in,temp);
 		//cout<<"thr: "<<thr<<endl;
@@ -37,6 +38,7 @@ void k_fold_cross_validation(int k, int q_num, string filePath){
 				//cout<<temp<<endl;
 				fold_prec[i].push_back(prec);
 				fold_recall[i].push_back(recall);
+				counter++;
 				if (prec == 0 && recall== 0 )
 					fold_f_measure[i].push_back(0);	
 				else
@@ -46,18 +48,22 @@ void k_fold_cross_validation(int k, int q_num, string filePath){
 			fold_size[i] = fold_prec[i].size();
 		}
 		//edit for other than 2 fold!
-		getline(in,temp);
-		stringstream ss(temp);
-		double prec,recall;
-		ss>>temp>>temp>>prec>>temp>>temp>>recall;
-		//cout<<temp<<endl;
-		fold_prec[k-1].push_back(prec);
-		fold_recall[k-1].push_back(recall);
-		if (prec == 0 && recall== 0 )
-			fold_f_measure[k-1].push_back(0);	
-		else
-			fold_f_measure[k-1].push_back((2*prec*recall)/(prec+recall));
+		for (int i = fold*k ; i<q_num ; i++){
+			getline(in,temp);
+			stringstream ss(temp);
+			double prec,recall;
+			ss>>temp>>temp>>prec>>temp>>temp>>recall;
+			//cout<<temp<<endl;
+			counter++;
+			fold_prec[k-1].push_back(prec);
+			fold_recall[k-1].push_back(recall);
+			if (prec == 0 && recall== 0 )
+				fold_f_measure[k-1].push_back(0);	
+			else
+				fold_f_measure[k-1].push_back((2*prec*recall)/(prec+recall));
+		}
 		//cout<<"last "<<prec<<" "<<recall<<endl;
+		//cout<<counter<<endl;
 		getline(in,temp);
 		getline(in,temp);
 		getline(in,temp);
@@ -98,7 +104,34 @@ void k_fold_cross_validation(int k, int q_num, string filePath){
 		max_recall[i] = -1;
 		max_f_measure[i] = -1;
 	}
-	for(map<string, map<int,double> >::iterator it = avg_fold_prec.begin() ; it!=avg_fold_prec.end() ; it++){
+	for(int i = 0 ; i<k ; i++){
+		//cout<<"<"<<i<<">"<<endl;
+		for(map<string, map<int,double> >::iterator it = avg_fold_f_measure.begin() ; it!=avg_fold_f_measure.end() ; it++){
+			double sum = 0, num = 0;
+			for(int j = 0 ; j<k ; j++){
+				if (j==i)
+					continue;
+				sum += it->second[j]* fold_size[j];
+				num += fold_size[j];				
+			}
+			//cout<<sum<<" "<<num<<endl;
+			if (sum/num > max_f_measure[i]){
+				max_f_measure[i] = sum/num;
+				max_f_measure_thr[i] = it->first;
+			}
+		}
+	}
+	double sum = 0, num = 0;
+	for(int i = 0 ; i<k ; i++){
+		//cout<<i<<" "<<max_f_measure_thr[i]<<" "<<max_f_measure[i]<<endl;
+		for(int j = 0 ; j<fold_size[i];j++){
+			cout<<thr_f_measure[max_f_measure_thr[i]][i][j]<<endl;
+			sum +=	thr_f_measure[max_f_measure_thr[i]][i][j];
+			num++;
+		}
+	}
+	cout<<"f_measure: "<<sum/num<<endl;
+	/*for(map<string, map<int,double> >::iterator it = avg_fold_prec.begin() ; it!=avg_fold_prec.end() ; it++){
 		for(int i = 0 ; i<k ; i++){
 			if(it->second[i] > max_prec[i]){
 				max_prec[i] = it->second[i];
@@ -121,7 +154,7 @@ void k_fold_cross_validation(int k, int q_num, string filePath){
 				max_f_measure_thr[i] = it->first;
 			}
 		}	
-	}
+	}*/
 	//edit for other than 2 fold!
 	//for(int i = 0 ; i<k ; i++)
 	//	cout<<i<<" "<<max_prec_thr[i]<<endl;
@@ -151,21 +184,25 @@ void k_fold_cross_validation(int k, int q_num, string filePath){
 
 	final_recall /= (double)q_num;
 	cout<<"recall: "<<final_recall<<endl;*/
-	double final_f_measure = (avg_fold_f_measure[max_f_measure_thr[1]][0] * fold_size[0]) + (avg_fold_f_measure[max_f_measure_thr[0]][1] * fold_size[1]);
-	//cout<<fold_size[0]<<" "<<fold_size[1]<<endl;
-	for(int i = 0 ; i<fold_size[0];i++){
-		cout<<thr_f_measure[max_f_measure_thr[1]][0][i]<<endl;
-	}
-	for(int i = 0 ; i<fold_size[1];i++){
-		cout<<thr_f_measure[max_f_measure_thr[0]][1][i]<<endl;
-	}
+	
 
-	final_f_measure /= (double)q_num;
-	cout<<"f_measure: "<<final_f_measure<<endl;
+
+	//double final_f_measure = (avg_fold_f_measure[max_f_measure_thr[1]][0] * fold_size[0]) + (avg_fold_f_measure[max_f_measure_thr[0]][1] * fold_size[1]);
+	//cout<<fold_size[0]<<" "<<fold_size[1]<<endl;
+	//for(int i = 0 ; i<fold_size[0];i++){
+	//	cout<<thr_f_measure[max_f_measure_thr[1]][0][i]<<endl;
+	//}
+	//for(int i = 0 ; i<fold_size[1];i++){
+	//	cout<<thr_f_measure[max_f_measure_thr[0]][1][i]<<endl;
+	//}
+
+	//final_f_measure /= (double)q_num;
+	//cout<<"f_measure: "<<final_f_measure<<endl;
+
 }
 
 
 int main(int argc, char* argv[]){
-	k_fold_cross_validation(2,47,argv[1]);
+	k_fold_cross_validation(5,47,argv[1]);
 	//k_fold_cross_validation(2,47,"/home/mozhdeh/Desktop/IR/RS-Framework/RS/out_2/NegColl_2500_Nofb_NoUpdatingThr_profDocThr:_0.5:3.5(0.1)");
 }
