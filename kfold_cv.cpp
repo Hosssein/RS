@@ -129,7 +129,7 @@ void k_fold_cross_validation(int k, int q_num, string filePath){
 	for(int i = 0 ; i<k ; i++){
 		//cout<<i<<" "<<max_f_measure_thr[i]<<" "<<max_f_measure[i]<<endl;
 		for(int j = 0 ; j<fold_size[i];j++){
-			cout<<thr_f_measure[max_f_measure_thr[i]][i][j]<<endl;
+			out<<thr_f_measure[max_f_measure_thr[i]][i][j]<<endl;
 			sum +=	thr_f_measure[max_f_measure_thr[i]][i][j];
 			num++;
 		}
