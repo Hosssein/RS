@@ -484,8 +484,8 @@ void lemur::retrieval::RetMethod::updateThreshold(lemur::api::TextQueryRep &orig
             double adjustedScore = scoreFunc()->adjustedScore(sc, textQR, dRep);
 
             delete dRep;
-            cout<<"neg score:**********:"<<negQueryGenerationScore<<endl;
-            cout<<"pos score:**********:"<<adjustedScore<<endl;
+           // cout<<"neg score:**********:"<<negQueryGenerationScore<<endl;
+            //cout<<"pos score:**********:"<<adjustedScore<<endl;
             return negQueryGenerationScore + adjustedScore;
 
 

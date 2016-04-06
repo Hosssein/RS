@@ -241,10 +241,10 @@ void computeRSMethods(Index* ind)
                                                 int docID = docids[i];
                                                 //if (docID != ind->document("afp.com-20040109T173702Z-TX-SGE-UQQ37.xml"))
                                                 //	continue;
-                                                cout<<"docid: "<< ind->document(docID)<<endl;
+                                                //cout<<"docid: "<< ind->document(docID)<<endl;
                                                 float sim = myMethod->computeProfDocSim(((TextQueryRep *)(qr)) ,docID, relJudgDocs , nonRelJudgDocs , newNonRel);
 
-                                                cout<<sim<<endl;
+                                                //cout<<sim<<endl;
                                                 if(sim >=  myMethod->getThreshold() )
                                                 {
 

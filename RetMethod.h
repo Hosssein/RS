@@ -23,9 +23,9 @@
 #include "TextQueryRetMethod.h"
 #include "Counter.hpp"
 #include "DocUnigramCounter.hpp"
-
+#include "TermInfoList.hpp"
 #include "Parameters.h"
-
+using namespace lemur::api;
 
 extern double negGenMUHM;
 extern int RSMethodHM;
@@ -159,83 +159,47 @@ public:
 
         if(whichMethod == 0)//baseline(collection)
         {
-            double readedDelta=delta;//0.007;
-
             double mu= negMu;//ind.docLengthAvg();//negGenMUHM;//2500;
             negQueryGen =0;
-
 
             lemur::api::COUNT_T tc = ind.termCount();
             startIteration();
             lemur::utility::HashFreqVector hfv(ind,dRep->getID());
-            //cout<<"Did: "<<ind.document(dRep->getID())<<endl;
             while (hasMore())
             {
-
                 lemur::api::QueryTerm *qt = nextTerm();
                 double pwq = qt->weight()/totalCount();
-                //cout<<qt->id()<<" "<<pwq<<endl;
-
-                double delta =readedDelta;
-
+                
                 int freq=0;
                 hfv.find(qt->id(),freq);
                 if(freq>0)
                     delta =0.0;
 
                 lemur::api::TERMID_T id = qt->id();
-
                 lemur::api::COUNT_T qtcf = ind.termCount(id);
 
                 double pwc = (double)qtcf/(double)tc;
                 double pwdbar = (delta/(delta*ind.termCountUnique()+mu))+((mu*pwc)/(delta*ind.termCountUnique()+mu));
                 negQueryGen+= pwq *log(pwq/pwdbar);
-                //cout<<ind.termCount(qt->id())<<" "<<ind.term(qt->id())<<": "<<delta<<","<<pwdbar<<endl;
+
                 delete qt;
             }
             return negQueryGen;
-
         }else if (whichMethod == 1)// using DN instead of collection
         {
             if (newNonRel)
                 DNsize += ind.docLength(JudgDocs[JudgDocs.size()-1]);
-            //cout<<"Did: "<<ind.document(dRep->getID())<<" DNsize: "<<DNsize<<endl;
+         
             double mu= negMu;//ind.docLengthAvg();//negGenMUHM;//2500;
             negQueryGen =0;
-            //if(negQueryGen == 0)
-            //{
             lemur::api::COUNT_T tc = ind.termCount();
-            startIteration();
-            double surat = 0, makhraj = 0, cwdbar = 0;
+            
             lemur::utility::HashFreqVector hfv(ind,dRep->getID()), *hfv2;
-            /*
-            while(hasMore()){
-                lemur::api::QueryTerm *qt = nextTerm();
-                int freq=0 ;
-                hfv.find(qt->id(),freq);
-                if(freq>0)
-                    cwdbar = 0;
-                else
-                {
-                    cwdbar = countInNonRel[qt->id()];
-                }
-                if (cwdbar != 0)
-                    surat+= cwdbar/DNsize;
-                lemur::api::TERMID_T id = qt->id();
-                lemur::api::COUNT_T qtcf = ind.termCount(id);
-                double pwc = (double)qtcf/(double)tc;
-
-                makhraj+= pwc;
-                //cout<<ind.term(qt->id())<<": "<<cwdbar<<","<<DNsize<<"-> "<<cwdbar/DNsize<<endl;
-            }
-            double alpha_d = (1.0-surat)/makhraj;
-            */
             if (newNonRel)
                 hfv2 = new lemur::utility::HashFreqVector(ind,JudgDocs[JudgDocs.size()-1]);
             startIteration();
             while (hasMore())
             {
-                //cout<<"hala "<<DNsize<<endl;
                 lemur::api::QueryTerm *qt = nextTerm();
                 double pwq = qt->weight()/totalCount();
                 if (newNonRel)
@@ -245,62 +209,81 @@ public:
                     countInNonRel[qt->id()] += freq;
                 }
                 double cwdbar = 0;
-
                 int freq=0 ;
                 hfv.find(qt->id(),freq);
                 if(freq>0){
                     cwdbar = 0;
-                    //delete qt;
-                    //cout<<"boogh"<<endl;
-                    //continue;
                 }
                 else
                 {
-                   // cout<<"booooooooooooogh"<<endl;
-                    /*for (int i = 0 ; i<JudgDocs.size() ; i++){
-                            lemur::utility::HashFreqVector hfv(ind,JudgDocs[i]);
-                            hfv.find(qt->id(),freq);
-                            cwdbar += freq;
-                            DNsize += ind.docLength(JudgDocs[i]);
-                        }*/
                     cwdbar = countInNonRel[qt->id()];
                 }
                 lemur::api::TERMID_T id = qt->id();
-
                 lemur::api::COUNT_T qtcf = ind.termCount(id);
-
-                //DNsize = countInNonRel.size();//????????????????????????????????????
 
                 double pwc = (double)qtcf/(double)tc;
                 double pwdbar;
-                //if (cwdbar != 0)
-                    pwdbar = (cwdbar/((DNsize+mu)))+((mu*pwc)/(DNsize+mu));
-                //else
-                  //  pwdbar = (delta/(delta*ind.termCountUnique()+mu))+((mu*pwc)/(delta*ind.termCountUnique()+mu));
-                /*if (cwdbar == 0)
-                    pwdbar = pwc;
-                else
-                    pwdbar = (alpha_d*cwdbar)/DNsize;*/
-                    //if (freq==0)
-                        cout<<freq<<" "<< pwq *log(pwq/pwdbar)<<endl;
-                        negQueryGen+= pwq *log(pwq/pwdbar);
-                //cout<<ind.term(qt->id())<<" freq: "<<freq<<" (cwdbar/(DNsize+mu)): "<<(cwdbar/(DNsize+mu))<<" pwdbar: "<<pwdbar<<endl;
-                //cout<<"na hala DNsize: "<<DNsize<<"\nnegQueryGen: "<<negQueryGen<<endl<<endl;
-             //   cout<<"cwdbar: "<<cwdbar<<"\npwc: "<<pwc<<"\npwdbar: "<<pwdbar<<endl;
-               // cout<<ind.termCount(qt->id())<<" "<<ind.term(qt->id())<<": "<<cwdbar<<","<<pwdbar<<endl;
+                pwdbar = (cwdbar/((DNsize+mu)))+((mu*pwc)/(DNsize+mu));
+                negQueryGen+= pwq *log(pwq/pwdbar);
                 delete qt;
-
-
             }
             if (newNonRel)
                 delete hfv2;
-            //}
-//            cout<<"Did: "<<dRep->getID()<<endl;
-            //cout<<"DNsize: "<<DNsize<<"\nnegQueryGen: "<<negQueryGen<<endl<<endl;
             return negQueryGen;
-            //cout<<negQueryGen<<"dddddddddddd\n";
         }
+        else if (whichMethod == 2){
+            
+            double mu= negMu;
+            negQueryGen =0;
 
+            lemur::api::COUNT_T tc = ind.termCount();
+            startIteration();
+            lemur::utility::HashFreqVector hfv(ind,dRep->getID()), * hfv2;
+            if (newNonRel){
+                DNsize += ind.docLength(JudgDocs[JudgDocs.size()-1]);
+                hfv2 = new lemur::utility::HashFreqVector(ind,JudgDocs[JudgDocs.size()-1]);
+
+                TermInfoList *termList = ind.termInfoList(JudgDocs[JudgDocs.size()-1]);
+                termList->startIteration();   
+                TermInfo *tEntry;
+                while (termList->hasMore()) {
+                    tEntry = termList->nextEntry(); 
+                    uniqueNonRel.insert(tEntry->termID());
+                }
+                delete termList;
+            }
+            while (hasMore())
+            {
+                lemur::api::QueryTerm *qt = nextTerm();
+                double pwq = qt->weight()/totalCount();
+                
+                int freq=0;
+                hfv.find(qt->id(),freq);
+                if (newNonRel)
+                {
+                    int freq;
+                    hfv2->find(qt->id(),freq);
+                    countInNonRel[qt->id()] += freq;
+                    
+                }
+                if(freq>0  ||  countInNonRel[qt->id()]==0)
+                    delta =0.0;
+                
+                lemur::api::TERMID_T id = qt->id();
+                lemur::api::COUNT_T qtcf = ind.termCount(id);
+
+                double pwc = (double)qtcf/(double)tc;
+                double pwdbar = (delta/(delta*uniqueNonRel.size()+mu))+((mu*pwc)/(delta*uniqueNonRel.size()+mu));
+                negQueryGen+= pwq *log(pwq/pwdbar);
+
+                delete qt;
+            }
+            if (newNonRel)
+                delete hfv2;
+            
+            return negQueryGen;
+
+        }
     }
 
     double negativeKL(const lemur::api::DocumentRep *dRep, vector<int> JudgDocs, bool newNonRel, double negMu, double beta = 1) const
@@ -430,6 +413,7 @@ protected:
     mutable bool colKLComputed;
 
     mutable map <int, int> countInNonRel;
+    mutable set <int> uniqueNonRel;
     mutable int DNsize ;
 
 

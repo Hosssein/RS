@@ -50,6 +50,11 @@ void readParams(string paramFileName)
             outputFileNameHM += "out/NegNonRel_";
             resultFileNameHM += "res/NegNonRel_";
         }
+        else if(negGenModeHM == 2)
+        {
+            outputFileNameHM += "out/UniNegNonRel_";
+            resultFileNameHM += "res/UniNegNonRel_";
+        }
         //outputFileNameHM+=numToStrHM(negGenMUHM)+"_";
         //resultFileNameHM+=numToStrHM(negGenMUHM)+"_";
     }else if (RSMethodHM == 0)
