@@ -49,6 +49,7 @@ extern double startNegMu, endNegMu, NegMuInterval;
 extern double startDelta, endDelta, deltaInterval;
 extern int RSMethodHM;
 extern int negGenModeHM;
+extern double smoothJMInterval1,smoothJMInterval2;
 
 extern int updatingThresholdMode;
 
@@ -146,6 +147,13 @@ void computeRSMethods(Index* ind)
                 myMethod->setNegMu(negmu);
                 resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(negmu)+".res";
 
+                //for (double lambda_1 = 0 ; lambda_1<=1 ; lambda_1 += smoothJMInterval1){
+                    double lambda_1 = smoothJMInterval1;
+                    myMethod->setLambda1(lambda_1);
+                    for (double lambda_2 = 0 ; lambda_2<=1 ; lambda_2 += smoothJMInterval2){
+                        resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(negmu)+"_lambda1:"+numToStr( lambda_1)+"_lambda2:"+numToStr( lambda_2)+".res";
+                        myMethod->setLambda2(lambda_2);
+
 #endif
 
 
@@ -189,8 +197,9 @@ void computeRSMethods(Index* ind)
 
 
                                         IndexedRealVector results;
+
                                         out<<"threshold: "<<myMethod->getThreshold()<< " negmu: "<<myMethod->getNegMu();
-                                        out<<" delta: "<<myMethod->getDelta()<<endl;
+                                        out<<" delta: "<<myMethod->getDelta()<<" lambda_1: "<<lambda_1<<" lambda_2: "<<lambda_2<<endl;
 
                                         qs->startDocIteration();
                                         TextQuery *q;
@@ -384,6 +393,8 @@ void computeRSMethods(Index* ind)
 #endif
 
 #if !FBMODE && !UPDTHRMODE
+               // }
+            }
         }
     }
     }

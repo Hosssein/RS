@@ -23,6 +23,8 @@ double startNegWeight ,endNegWeight ,negWeightInterval;
 double startNegMu, endNegMu, NegMuInterval;
 double startDelta, endDelta, deltaInterval;
 
+double smoothJMInterval1, smoothJMInterval2;
+
 int RSMethodHM; // 0--> LM , 1--> RecSys
 int negGenModeHM;//0 --> coll , 1--> nonRel
 
@@ -54,6 +56,11 @@ void readParams(string paramFileName)
         {
             outputFileNameHM += "out/UniNegNonRel_";
             resultFileNameHM += "res/UniNegNonRel_";
+        }
+        else if(negGenModeHM == 3)
+        {
+            outputFileNameHM += "out/SmoothNegNonRel_";
+            resultFileNameHM += "res/SmoothNegNonRel_";
         }
         //outputFileNameHM+=numToStrHM(negGenMUHM)+"_";
         //resultFileNameHM+=numToStrHM(negGenMUHM)+"_";
@@ -139,6 +146,14 @@ void readParamFile(string paramfileName)
         iss.clear();
         iss.str( topic->child("NegativeMode").first_child().value());
         iss>>negGenModeHM;
+        
+        iss.clear();
+        iss.str( topic->child("SmoothJMInterval1").first_child().value());
+        iss>>smoothJMInterval1;
+
+        iss.clear();
+        iss.str( topic->child("SmoothJMInterval2").first_child().value());
+        iss>>smoothJMInterval2;
 
       //  iss.clear();
        // iss.str(topic->child("NegMu").first_child().value());

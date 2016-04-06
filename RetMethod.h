@@ -154,7 +154,7 @@ public:
      * wichMethod: 0 --> baseline collection
      *             1 --> baseline nonRel
     */
-    double negativeQueryGeneration( const lemur::api::DocumentRep *dRep, vector<int> JudgDocs  , int whichMethod , bool newNonRel, double negMu , double delta) const
+    double negativeQueryGeneration( const lemur::api::DocumentRep *dRep, vector<int> JudgDocs  , int whichMethod , bool newNonRel, double negMu , double delta, double lambda, double lambda_2) const
     {
 
         if(whichMethod == 0)//baseline(collection)
@@ -231,7 +231,8 @@ public:
                 delete hfv2;
             return negQueryGen;
         }
-        else if (whichMethod == 2){
+        else if (whichMethod == 2)//Uniform nonrel
+        {
             
             double mu= negMu;
             negQueryGen =0;
@@ -281,6 +282,63 @@ public:
             if (newNonRel)
                 delete hfv2;
             
+            return negQueryGen;
+
+        }
+        else if (whichMethod == 3)//smooth nonrel with collection
+        {
+            //double lambda = 0.5, lambda_2 = 0.5;//2000;
+            if (newNonRel)
+                DNsize += ind.docLength(JudgDocs[JudgDocs.size()-1]);
+         
+            double mu= negMu;//ind.docLengthAvg();//negGenMUHM;//2500;
+            negQueryGen =0;
+            lemur::api::COUNT_T tc = ind.termCount();
+            
+            lemur::utility::HashFreqVector hfv(ind,dRep->getID()), *hfv2;
+            if (newNonRel)
+                hfv2 = new lemur::utility::HashFreqVector(ind,JudgDocs[JudgDocs.size()-1]);
+            startIteration();
+            while (hasMore())
+            {
+                lemur::api::QueryTerm *qt = nextTerm();
+                double pwq = qt->weight()/totalCount();
+                if (newNonRel)
+                {
+                    int freq;
+                    hfv2->find(qt->id(),freq);
+                    countInNonRel[qt->id()] += freq;
+                }
+                double cwdbar = 0 , cwdbar_negColl = 1;
+                int freq=0 ;
+                hfv.find(qt->id(),freq);
+                if(freq>0){
+                    cwdbar = 0;
+                    cwdbar_negColl = 0;
+                }
+                else
+                {
+                    cwdbar = countInNonRel[qt->id()];
+                }
+                lemur::api::TERMID_T id = qt->id();
+                lemur::api::COUNT_T qtcf = ind.termCount(id);
+
+                //double pml_smoothed = (cwdbar/(DNsize+lambda)) + ((lambda * delta)/((DNsize+lambda)*(delta*ind.termCountUnique())));
+                double pml_smoothed;
+                if (DNsize == 0)
+                    pml_smoothed = (1.0 - lambda) * (cwdbar_negColl/ind.termCountUnique());
+                else
+                    pml_smoothed = lambda * (cwdbar/DNsize) + (1.0 - lambda) * (cwdbar_negColl/ind.termCountUnique());
+                
+                double pwc = (double)qtcf/(double)tc;
+                double pwdbar;
+                //pwdbar = ((pml_smoothed*DNsize)/((DNsize+mu)))+((mu*pwc)/(DNsize+mu));
+                pwdbar = lambda_2 * pml_smoothed + (1.0 - lambda_2) * pwc;
+                negQueryGen+= pwq *log(pwq/pwdbar);
+                delete qt;
+            }
+            if (newNonRel)
+                delete hfv2;
             return negQueryGen;
 
         }
@@ -576,6 +634,13 @@ public:
     double getNegMu(){return NegMu;}
     void setNegMu(double val){NegMu=val;}
 
+    double getLambda1(){return lambda_1;}
+    void setLambda1(double val){lambda_1=val;}
+
+    double getLambda2(){return lambda_2;}
+    void setLambda2(double val){lambda_2=val;}
+
+    
     double getDelta(){return delta;}
     void setDelta(double val){delta = val;}
 
@@ -592,6 +657,8 @@ protected:
     double NegMu;
     double delta;
 
+    double lambda_1;
+    double lambda_2;
     //Matrix Factorization method for query expansion
     bool MF;
 

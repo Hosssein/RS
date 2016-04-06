@@ -474,7 +474,7 @@ void lemur::retrieval::RetMethod::updateThreshold(lemur::api::TextQueryRep &orig
             //cout<<"negative score:"<<endl;
             if(RSMethodHM == 1)//RecSys(neg,coll)
             {
-                negQueryGenerationScore= qm->negativeQueryGeneration(dRep ,nonReljudgDoc ,negGenModeHM, newNonRel,NegMu,delta);
+                negQueryGenerationScore= qm->negativeQueryGeneration(dRep ,nonReljudgDoc ,negGenModeHM, newNonRel,NegMu,delta,lambda_1,lambda_2);
             }
             else if (RSMethodHM == 2 || RSMethodHM == 3)//RecSys negKLQTE(2) and negKL(3)
             {    
