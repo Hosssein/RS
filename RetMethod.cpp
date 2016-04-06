@@ -442,7 +442,7 @@ void lemur::retrieval::RetMethod::updateThreshold(lemur::api::TextQueryRep &orig
 
 
             const QueryModel *qm = dynamic_cast<const QueryModel *>(textQR);
-
+            //cout<<"positive score"<<endl;
             double sc = 0;
             DocumentRep *dRep;
             HashFreqVector hfv(ind,docID);
@@ -465,11 +465,13 @@ void lemur::retrieval::RetMethod::updateThreshold(lemur::api::TextQueryRep &orig
 
 
                 sc += scoreFunc()->matchedTermWeight(qTerm, textQR, info, dRep);//QL = sc+=|q|*log( p_seen(w|d)/(a(d)*p(w|C)) ) [slide7-11]
+                //cout<<ind.term(qTerm->id())<<": "<<scoreFunc()->matchedTermWeight(qTerm, textQR, info, dRep)<<endl;
                 delete info;
                 delete qTerm;
             }
 
             double negQueryGenerationScore=0.0;
+            //cout<<"negative score:"<<endl;
             if(RSMethodHM == 1)//RecSys(neg,coll)
             {
                 negQueryGenerationScore= qm->negativeQueryGeneration(dRep ,nonReljudgDoc ,negGenModeHM, newNonRel,NegMu,delta);
@@ -482,6 +484,8 @@ void lemur::retrieval::RetMethod::updateThreshold(lemur::api::TextQueryRep &orig
             double adjustedScore = scoreFunc()->adjustedScore(sc, textQR, dRep);
 
             delete dRep;
+            cout<<"neg score:**********:"<<negQueryGenerationScore<<endl;
+            cout<<"pos score:**********:"<<adjustedScore<<endl;
             return negQueryGenerationScore + adjustedScore;
 
 

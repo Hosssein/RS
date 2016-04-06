@@ -168,6 +168,7 @@ public:
             lemur::api::COUNT_T tc = ind.termCount();
             startIteration();
             lemur::utility::HashFreqVector hfv(ind,dRep->getID());
+            //cout<<"Did: "<<ind.document(dRep->getID())<<endl;
             while (hasMore())
             {
 
@@ -189,7 +190,7 @@ public:
                 double pwc = (double)qtcf/(double)tc;
                 double pwdbar = (delta/(delta*ind.termCountUnique()+mu))+((mu*pwc)/(delta*ind.termCountUnique()+mu));
                 negQueryGen+= pwq *log(pwq/pwdbar);
-
+                //cout<<ind.termCount(qt->id())<<" "<<ind.term(qt->id())<<": "<<delta<<","<<pwdbar<<endl;
                 delete qt;
             }
             return negQueryGen;
@@ -198,19 +199,43 @@ public:
         {
             if (newNonRel)
                 DNsize += ind.docLength(JudgDocs[JudgDocs.size()-1]);
-
+            //cout<<"Did: "<<ind.document(dRep->getID())<<" DNsize: "<<DNsize<<endl;
             double mu= negMu;//ind.docLengthAvg();//negGenMUHM;//2500;
             negQueryGen =0;
             //if(negQueryGen == 0)
             //{
             lemur::api::COUNT_T tc = ind.termCount();
             startIteration();
+            double surat = 0, makhraj = 0, cwdbar = 0;
             lemur::utility::HashFreqVector hfv(ind,dRep->getID()), *hfv2;
+            /*
+            while(hasMore()){
+                lemur::api::QueryTerm *qt = nextTerm();
+                int freq=0 ;
+                hfv.find(qt->id(),freq);
+                if(freq>0)
+                    cwdbar = 0;
+                else
+                {
+                    cwdbar = countInNonRel[qt->id()];
+                }
+                if (cwdbar != 0)
+                    surat+= cwdbar/DNsize;
+                lemur::api::TERMID_T id = qt->id();
+                lemur::api::COUNT_T qtcf = ind.termCount(id);
+                double pwc = (double)qtcf/(double)tc;
+
+                makhraj+= pwc;
+                //cout<<ind.term(qt->id())<<": "<<cwdbar<<","<<DNsize<<"-> "<<cwdbar/DNsize<<endl;
+            }
+            double alpha_d = (1.0-surat)/makhraj;
+            */
             if (newNonRel)
                 hfv2 = new lemur::utility::HashFreqVector(ind,JudgDocs[JudgDocs.size()-1]);
+            startIteration();
             while (hasMore())
             {
-
+                //cout<<"hala "<<DNsize<<endl;
                 lemur::api::QueryTerm *qt = nextTerm();
                 double pwq = qt->weight()/totalCount();
                 if (newNonRel)
@@ -223,10 +248,15 @@ public:
 
                 int freq=0 ;
                 hfv.find(qt->id(),freq);
-                if(freq>0)
+                if(freq>0){
                     cwdbar = 0;
+                    //delete qt;
+                    //cout<<"boogh"<<endl;
+                    //continue;
+                }
                 else
                 {
+                   // cout<<"booooooooooooogh"<<endl;
                     /*for (int i = 0 ; i<JudgDocs.size() ; i++){
                             lemur::utility::HashFreqVector hfv(ind,JudgDocs[i]);
                             hfv.find(qt->id(),freq);
@@ -239,15 +269,25 @@ public:
 
                 lemur::api::COUNT_T qtcf = ind.termCount(id);
 
-                DNsize = countInNonRel.size();//????????????????????????????????????
+                //DNsize = countInNonRel.size();//????????????????????????????????????
 
                 double pwc = (double)qtcf/(double)tc;
-                double pwdbar = (cwdbar/(DNsize+mu))+((mu*pwc)/(DNsize+mu));
-                negQueryGen+= pwq *log(pwq/pwdbar);
-
-
+                double pwdbar;
+                //if (cwdbar != 0)
+                    pwdbar = (cwdbar/((DNsize+mu)))+((mu*pwc)/(DNsize+mu));
+                //else
+                  //  pwdbar = (delta/(delta*ind.termCountUnique()+mu))+((mu*pwc)/(delta*ind.termCountUnique()+mu));
+                /*if (cwdbar == 0)
+                    pwdbar = pwc;
+                else
+                    pwdbar = (alpha_d*cwdbar)/DNsize;*/
+                    //if (freq==0)
+                        cout<<freq<<" "<< pwq *log(pwq/pwdbar)<<endl;
+                        negQueryGen+= pwq *log(pwq/pwdbar);
+                //cout<<ind.term(qt->id())<<" freq: "<<freq<<" (cwdbar/(DNsize+mu)): "<<(cwdbar/(DNsize+mu))<<" pwdbar: "<<pwdbar<<endl;
+                //cout<<"na hala DNsize: "<<DNsize<<"\nnegQueryGen: "<<negQueryGen<<endl<<endl;
              //   cout<<"cwdbar: "<<cwdbar<<"\npwc: "<<pwc<<"\npwdbar: "<<pwdbar<<endl;
-
+               // cout<<ind.termCount(qt->id())<<" "<<ind.term(qt->id())<<": "<<cwdbar<<","<<pwdbar<<endl;
                 delete qt;
 
 
@@ -256,7 +296,7 @@ public:
                 delete hfv2;
             //}
 //            cout<<"Did: "<<dRep->getID()<<endl;
-  //          cout<<"DNsize: "<<DNsize<<"\nnegQueryGen: "<<negQueryGen<<endl<<endl;
+            //cout<<"DNsize: "<<DNsize<<"\nnegQueryGen: "<<negQueryGen<<endl<<endl;
             return negQueryGen;
             //cout<<negQueryGen<<"dddddddddddd\n";
         }
