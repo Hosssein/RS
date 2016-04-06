@@ -79,6 +79,11 @@ void readParams(string paramFileName)
         resultFileNameHM += "res/NegKL_";
 
     }
+    else if(RSMethodHM == 4){
+        outputFileNameHM += "out/Fang_";
+        resultFileNameHM += "res/Fang_";
+
+    }
     if(feedbackMode == 0)//no fb
     {
         outputFileNameHM+="Nofb_";

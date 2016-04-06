@@ -344,6 +344,7 @@ public:
         }
     }
 
+
     double negativeKL(const lemur::api::DocumentRep *dRep, vector<int> JudgDocs, bool newNonRel, double negMu, double beta = 1) const
     {
        if (newNonRel)
@@ -530,12 +531,18 @@ public:
         // dynamic_cast<SimpleKLDocModel *>dRep;
 
         double qsc = qm->scoreConstant();//|q|
+
         double dsc = log(dRep->scoreConstant());//log(a(d))
+
         double cql = qm->colQueryLikelihood();//sigma(c(w,q)*P(w|C))
         // real query likelihood
+
         double s = dsc * qsc + origScore + cql;
+
         double qsNorm = origScore/qsc;
+
         double qmD = qm->colDivergence();
+
         /*
           cerr << "A:"<< origScore << " dsc:" << dsc  << " qsc:" << qsc
           << " cql:" << cql << " s:"  << s << endl;
@@ -558,8 +565,10 @@ public:
         case RetParameter::NEGATIVEKLD:
             /// ==== Option 3: negative KL-divergence ====
             // This is the exact (negative) KL-divergence value, i.e., -D(Mq||Md)
+      
             assert(qm->scoreConstant()!=0);
             s = qsNorm + dsc - qmD;
+      
             /*
             cerr << origScore << ":" << qsNorm << ":" << dsc  << ":" << qmD  << ":" << s << endl;
           */
@@ -604,6 +613,111 @@ public:
                                  vector<int> relJudglDoc ,vector<int> nonReljudgDoc ,int mode,double relSumScores , double nonRelSumScores);
     virtual float computeProfDocSim(lemur::api::TextQueryRep *origRep,int docID ,vector<int>relDocs ,vector<int>nonRelDocs , bool newNonRel);
 
+    double fangScore( DocIDSet &relDocs, int docID, bool newNonRel){
+
+       COUNT_T numTerms = ind.termCountUnique();
+
+
+
+      double *distQuery = new double[numTerms+1];
+      double *distQueryEst = new double[numTerms+1];
+      if (newNonRel){
+      lemur::langmod::DocUnigramCounter *dCounter = new lemur::langmod::DocUnigramCounter(relDocs, ind);
+      double noisePr;
+
+      int i;
+
+      double meanLL=1e-40;
+      double distQueryNorm=0;
+
+      for (i=1; i<=numTerms;i++) {
+        distQueryEst[i] = rand()+0.001;
+        distQueryNorm+= distQueryEst[i];
+      }
+      noisePr = qryParam.fbMixtureNoise;
+
+      int itNum = qryParam.emIterations;
+      do {
+        // re-estimate & compute likelihood
+        double ll = 0;
+
+        for (i=1; i<=numTerms;i++) {
+            
+          distQuery[i] = distQueryEst[i]/distQueryNorm;
+          prev_distQuery[i] = distQuery[i];
+          // cerr << "dist: "<< distQuery[i] << endl;
+          distQueryEst[i] =0;
+        }
+
+        distQueryNorm = 0;
+
+        // compute likelihood
+        dCounter->startIteration();
+        while (dCounter->hasMore()) {
+          int wd; //dmf FIXME
+          double wdCt;
+          dCounter->nextCount(wd, wdCt);
+          ll += wdCt * log (noisePr*collectLM->prob(wd)  // Pc(w)
+                            + (1-noisePr)*distQuery[wd]); // Pq(w)
+        }
+        meanLL = 0.5*meanLL + 0.5*ll;
+        if (fabs((meanLL-ll)/meanLL)< 0.0001) {
+          //cerr << "converged at "<< qryParam.emIterations - itNum+1 
+           //    << " with likelihood= "<< ll << endl;
+          break;
+        } 
+
+        // update counts
+
+        dCounter->startIteration();
+        while (dCounter->hasMore()) {
+          int wd; // dmf FIXME
+          double wdCt;
+          dCounter->nextCount(wd, wdCt);
+          
+          double prTopic = (1-noisePr)*distQuery[wd]/
+            ((1-noisePr)*distQuery[wd]+noisePr*collectLM->prob(wd));
+
+          double incVal = wdCt*prTopic;
+          distQueryEst[wd] += incVal;
+          distQueryNorm += incVal;
+        }
+      } while (itNum-- > 0);
+      delete dCounter;
+        }
+      
+      //lemur::utility::ArrayCounter<double> lmCounter(numTerms+1);
+      double fang_score = 0;
+      lemur::utility::HashFreqVector hfv(ind,docID);
+      //DocModel *dm;
+      //dm = dynamic_cast<DocModel *> (dRep);
+      DocModel * dm = new DPriorDocModel(docID,
+                                   ind.docLength(docID),
+                                   *collectLM,
+                                   docProbMass,
+                                   docParam.DirPrior,
+                                   docParam.smthStrategy);
+      
+      for (int i=1; i<=numTerms; i++) {
+        if (distQuery[i] > 0) {
+            int tf=0 ;
+            hfv.find(i,tf);
+            fang_score+= prev_distQuery[i] * log (distQuery[i]/dm->seenProb(tf, i));
+          //lmCounter.incCount(i, distQuery[i]);
+        }
+      }
+      
+      delete dm;
+      //lemur::langmod::MLUnigramLM *fblm = new lemur::langmod::MLUnigramLM(lmCounter, ind.termLexiconID());
+      //origRep.interpolateWith(*fblm, (1-qryParam.fbCoeff), qryParam.fbTermCount,
+        //                      qryParam.fbPrSumTh, qryParam.fbPrTh);
+
+      //delete fblm;
+      
+        delete[] distQuery;
+      delete[] distQueryEst;
+      return fang_score;
+    }
 
     void setDocSmoothParam(RetParameter::DocSmoothParam &docSmthParam);
     void setQueryModelParam(RetParameter::QueryModelParam &queryModParam);
@@ -653,6 +767,8 @@ protected:
                                         */
     double C1,C2;//for linear
     double diffThrUpdatingParam;//for diff
+
+    double *prev_distQuery;
 
     double NegMu;
     double delta;
