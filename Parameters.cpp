@@ -126,6 +126,7 @@ void readParams(string paramFileName)
     outputFileNameHM += "profDocThr:_"+numToStrHM(startThresholdHM)+":"+numToStrHM(endThresholdHM)+"("+numToStrHM(intervalThresholdHM)+")";
     outputFileNameHM += "NegMu:_"+numToStrHM(startNegMu)+":"+numToStrHM(endNegMu)+"("+numToStrHM(NegMuInterval)+")";
     outputFileNameHM += "Delta:_"+numToStrHM(startDelta)+":"+numToStrHM(endDelta)+"("+numToStrHM(deltaInterval)+")";
+    outputFileNameHM += "Lambda1:_"+numToStrHM(smoothJMInterval1);
 
 }
 
