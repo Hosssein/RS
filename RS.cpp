@@ -126,6 +126,7 @@ void computeRSMethods(Index* ind)
 
     cout<< "RSMethod: "<<RSMethodHM<<" NegGenMode: "<<negGenModeHM<<" feedbackMode: "<<feedbackMode<<" updatingThrMode: "<<updatingThresholdMode<<"\n";
     cout<< "RSMethod: "<<RETMODE<<" NegGenMode: "<<NEGMODE<<" feedbackMode: "<<FBMODE<<" updatingThrMode: "<<UPDTHRMODE<<"\n";
+	cout<<"outfile: "<<outFilename<<endl;
     double start_thresh =startThresholdHM, end_thresh= endThresholdHM;
     double start_negMu =startNegMu, end_negMu= endNegMu;
     double start_delta =startDelta, end_delta= endDelta;
@@ -204,9 +205,9 @@ void computeRSMethods(Index* ind)
                                         qs->startDocIteration();
                                         TextQuery *q;
 
-                                        ofstream result(resultPath.c_str());
-                                        ResultFile resultFile(1);
-                                        resultFile.openForWrite(result,*ind);
+                                        //ofstream result(resultPath.c_str());
+                                        //ResultFile resultFile(1);
+                                        //resultFile.openForWrite(result,*ind);
 
                                         double relRetCounter = 0 , retCounter = 0 , relCounter = 0;
                                         vector<double> queriesPrecision,queriesRecall;
@@ -276,7 +277,10 @@ void computeRSMethods(Index* ind)
                                                     if(!isRel)
                                                     {
                                                         nonRelJudgDocs.push_back(docID);
+							//if(nonRelJudgDocs.size()%10 == 1)
                                                         newNonRel = true;
+							//else
+							//	newNonRel = false;
 
                                                         nonRelSumScores+=sim;
                                                         numberOfShownNonRelDocs++;
@@ -330,7 +334,7 @@ void computeRSMethods(Index* ind)
                                             }//endfor docs
 
                                             results.Sort();
-                                            resultFile.writeResults(q->id() ,&results,results.size());
+                                            //resultFile.writeResults(q->id() ,&results,results.size());
                                             relRetCounter += relJudgDocs.size();
                                             retCounter += results.size();
                                             relCounter += relDocs.size();
