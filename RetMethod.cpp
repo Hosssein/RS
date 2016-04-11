@@ -218,7 +218,7 @@ lemur::retrieval::RetMethod::RetMethod(const Index &dbIndex,
     qryParam.fbPrSumTh = RetParameter::defaultFBPrSumTh;
     qryParam.fbTermCount = 5;//RetParameter::defaultFBTermCount;
     qryParam.fbMixtureNoise = RetParameter::defaultFBMixNoise;
-    qryParam.emIterations = RetParameter::defaultEMIterations;
+    qryParam.emIterations = 50;//RetParameter::defaultEMIterations;
 
     docProbMass = NULL;
     uniqueTermCount = NULL;

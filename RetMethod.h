@@ -318,7 +318,8 @@ public:
                 }
                 else
                 {
-                    cwdbar = countInNonRel[qt->id()];
+                    //cwdbar = countInNonRel[qt->id()];
+                    cwdbar = 1;
                 }
                 lemur::api::TERMID_T id = qt->id();
                 lemur::api::COUNT_T qtcf = ind.termCount(id);
@@ -622,68 +623,68 @@ public:
       double *distQuery = new double[numTerms+1];
       double *distQueryEst = new double[numTerms+1];
       if (newNonRel){
-      lemur::langmod::DocUnigramCounter *dCounter = new lemur::langmod::DocUnigramCounter(relDocs, ind);
-      double noisePr;
+          lemur::langmod::DocUnigramCounter *dCounter = new lemur::langmod::DocUnigramCounter(relDocs, ind);
+          double noisePr;
 
-      int i;
+          int i;
 
-      double meanLL=1e-40;
-      double distQueryNorm=0;
+          double meanLL=1e-40;
+          double distQueryNorm=0;
 
-      for (i=1; i<=numTerms;i++) {
-        distQueryEst[i] = rand()+0.001;
-        distQueryNorm+= distQueryEst[i];
-      }
-      noisePr = qryParam.fbMixtureNoise;
+          for (i=1; i<=numTerms;i++) {
+            distQueryEst[i] = rand()+0.001;
+            distQueryNorm+= distQueryEst[i];
+          }
+          noisePr = qryParam.fbMixtureNoise;
 
-      int itNum = qryParam.emIterations;
-      do {
-        // re-estimate & compute likelihood
-        double ll = 0;
+          int itNum = qryParam.emIterations;
+          do {
+            // re-estimate & compute likelihood
+            double ll = 0;
 
-        for (i=1; i<=numTerms;i++) {
-            
-          distQuery[i] = distQueryEst[i]/distQueryNorm;
-          prev_distQuery[i] = distQuery[i];
-          // cerr << "dist: "<< distQuery[i] << endl;
-          distQueryEst[i] =0;
-        }
+            for (i=1; i<=numTerms;i++) {
+                
+              distQuery[i] = distQueryEst[i]/distQueryNorm;
+              prev_distQuery[i] = distQuery[i];
+              // cerr << "dist: "<< distQuery[i] << endl;
+              distQueryEst[i] =0;
+            }
 
-        distQueryNorm = 0;
+            distQueryNorm = 0;
 
-        // compute likelihood
-        dCounter->startIteration();
-        while (dCounter->hasMore()) {
-          int wd; //dmf FIXME
-          double wdCt;
-          dCounter->nextCount(wd, wdCt);
-          ll += wdCt * log (noisePr*collectLM->prob(wd)  // Pc(w)
-                            + (1-noisePr)*distQuery[wd]); // Pq(w)
-        }
-        meanLL = 0.5*meanLL + 0.5*ll;
-        if (fabs((meanLL-ll)/meanLL)< 0.0001) {
-          //cerr << "converged at "<< qryParam.emIterations - itNum+1 
-           //    << " with likelihood= "<< ll << endl;
-          break;
-        } 
+            // compute likelihood
+            dCounter->startIteration();
+            while (dCounter->hasMore()) {
+              int wd; //dmf FIXME
+              double wdCt;
+              dCounter->nextCount(wd, wdCt);
+              ll += wdCt * log (noisePr*collectLM->prob(wd)  // Pc(w)
+                                + (1-noisePr)*distQuery[wd]); // Pq(w)
+            }
+            meanLL = 0.5*meanLL + 0.5*ll;
+            if (fabs((meanLL-ll)/meanLL)< 0.0001) {
+              //cerr << "converged at "<< qryParam.emIterations - itNum+1 
+               //    << " with likelihood= "<< ll << endl;
+              break;
+            } 
 
-        // update counts
+            // update counts
 
-        dCounter->startIteration();
-        while (dCounter->hasMore()) {
-          int wd; // dmf FIXME
-          double wdCt;
-          dCounter->nextCount(wd, wdCt);
-          
-          double prTopic = (1-noisePr)*distQuery[wd]/
-            ((1-noisePr)*distQuery[wd]+noisePr*collectLM->prob(wd));
+            dCounter->startIteration();
+            while (dCounter->hasMore()) {
+              int wd; // dmf FIXME
+              double wdCt;
+              dCounter->nextCount(wd, wdCt);
+              
+              double prTopic = (1-noisePr)*distQuery[wd]/
+                ((1-noisePr)*distQuery[wd]+noisePr*collectLM->prob(wd));
 
-          double incVal = wdCt*prTopic;
-          distQueryEst[wd] += incVal;
-          distQueryNorm += incVal;
-        }
-      } while (itNum-- > 0);
-      delete dCounter;
+              double incVal = wdCt*prTopic;
+              distQueryEst[wd] += incVal;
+              distQueryNorm += incVal;
+            }
+          } while (itNum-- > 0);
+          delete dCounter;
         }
       
       //lemur::utility::ArrayCounter<double> lmCounter(numTerms+1);
