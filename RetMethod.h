@@ -318,8 +318,8 @@ public:
                 }
                 else
                 {
-                    //cwdbar = countInNonRel[qt->id()];
-                    cwdbar = 1;
+                    cwdbar = countInNonRel[qt->id()];
+                    //cwdbar = 1;//smooth uni
                 }
                 lemur::api::TERMID_T id = qt->id();
                 lemur::api::COUNT_T qtcf = ind.termCount(id);
