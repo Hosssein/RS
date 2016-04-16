@@ -59,8 +59,8 @@ void readParams(string paramFileName)
         }
         else if(negGenModeHM == 3)
         {
-            outputFileNameHM += "out/SmoothNegNonRel_";
-            resultFileNameHM += "res/SmoothNegNonRel_";
+            outputFileNameHM += "out/SmoothUniNegNonRel_";
+            resultFileNameHM += "res/SmoothUniNegNonRel_";
         }
         //outputFileNameHM+=numToStrHM(negGenMUHM)+"_";
         //resultFileNameHM+=numToStrHM(negGenMUHM)+"_";

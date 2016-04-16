@@ -308,6 +308,17 @@ public:
                     int freq;
                     hfv2->find(qt->id(),freq);
                     countInNonRel[qt->id()] += freq;
+
+	                TermInfoList *termList = ind.termInfoList(JudgDocs[JudgDocs.size()-1]);
+	                termList->startIteration();   
+	                TermInfo *tEntry;
+	                while (termList->hasMore()) 
+			{
+	                    tEntry = termList->nextEntry(); 
+	                    uniqueNonRel.insert(tEntry->termID());
+	                }
+	                delete termList;
+
                 }
                 double cwdbar = 0 , cwdbar_negColl = 1;
                 int freq=0 ;
@@ -318,8 +329,8 @@ public:
                 }
                 else
                 {
-                    cwdbar = countInNonRel[qt->id()];
-                    //cwdbar = 1;//smooth uni
+                    //cwdbar = countInNonRel[qt->id()];
+                    cwdbar = 1;//smooth uni
                 }
                 lemur::api::TERMID_T id = qt->id();
                 lemur::api::COUNT_T qtcf = ind.termCount(id);
@@ -329,7 +340,8 @@ public:
                 if (DNsize == 0)
                     pml_smoothed = (1.0 - lambda) * (cwdbar_negColl/ind.termCountUnique());
                 else
-                    pml_smoothed = lambda * (cwdbar/DNsize) + (1.0 - lambda) * (cwdbar_negColl/ind.termCountUnique());
+               //     pml_smoothed = lambda * (cwdbar/DNsize) + (1.0 - lambda) * (cwdbar_negColl/ind.termCountUnique());
+		     pml_smoothed = lambda * (cwdbar/uniqueNonRel.size()) + (1.0 - lambda) * (cwdbar_negColl/ind.termCountUnique());
                 
                 double pwc = (double)qtcf/(double)tc;
                 double pwdbar;
