@@ -58,7 +58,7 @@ string judgmentPath,indexPath,queryPath;
 string resultPath = "";
 //int numberOfProcessedQueries = 0 , numberOfQueries=0;
 
-#define DATASET 1 //0-->infile, 1-->ohsu
+#define DATASET 0 //0-->infile, 1-->ohsu
 
 int main(int argc, char * argv[])
 {
