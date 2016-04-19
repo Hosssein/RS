@@ -382,9 +382,9 @@ void computeRSMethods(Index* ind)
                                                 retCounter += results.size();
                                                 relCounter += relDocs.size();
 
-                                                global_all_rels += relCounter;
-                                                global_ret += retCounter;
-                                                global_rel_ret += relRetCounter;
+                                                //global_all_rels += relCounter;
+                                                //global_ret += retCounter;
+                                                //global_rel_ret += relRetCounter;
 
                                                 if(results.size() != 0)
                                                 {
@@ -422,8 +422,9 @@ void computeRSMethods(Index* ind)
                                             out<<"Avg Recall: "<<avgRecall<<endl;
                                             out<<"F-measure: "<<(2*avgPrec*avgRecall)/(avgPrec+avgRecall)<<endl<<endl;
 
-                                            double pp = global_rel_ret/global_ret;
-                                            double dd = global_rel_ret/global_all_rels;
+					    double pp = relRetCounter/retCounter;
+                                            double dd = relRetCounter/relCounter;
+                                            out<<"rel_ret: "<<relRetCounter<<" ret: "<<retCounter<<" rels: "<<relCounter<<endl;
                                             out<<"old_Avg Precision: "<<pp<<endl;
                                             out<<"old_Avg Recall: "<<dd<<endl;
                                             out<<"old_F-measure: "<<(2*pp*dd)/(pp+dd)<<endl<<endl;
