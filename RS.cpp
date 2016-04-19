@@ -327,6 +327,9 @@ void computeRSMethods(Index* ind)
                                                         }
                                                         results.PushValue(docID , sim);
 
+                                                        if(results.size() > 200)
+                                                            break;//user gived up
+
 
 #if 0//FBMODE
 
