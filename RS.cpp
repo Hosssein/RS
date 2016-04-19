@@ -58,7 +58,7 @@ string judgmentPath,indexPath,queryPath;
 string resultPath = "";
 //int numberOfProcessedQueries = 0 , numberOfQueries=0;
 
-#define DATASET 0 //0-->infile, 1-->ohsu
+#define DATASET 1 //0-->infile, 1-->ohsu
 
 int main(int argc, char * argv[])
 {
@@ -74,8 +74,10 @@ int main(int argc, char * argv[])
             queryPath = "/home/iis/Desktop/Edu/thesis/Data/INFILE/q_en_titleKeyword_en.stemmed.xml";
         }else if(DATASET == 1)//ohsu
         {
-            judgmentPath = "/home/iis/Desktop/Edu/thesis/Data/ohsumed/trec9-train/qrels.ohsu.adapt.87";
-            indexPath= "/home/iis/Desktop/Edu/thesis/index/ohsumed/ohsu/index/index.key";
+            //judgmentPath = "/home/iis/Desktop/Edu/thesis/Data/ohsumed/trec9-train/qrels.ohsu.adapt.87";
+            judgmentPath = "/home/iis/Desktop/Edu/thesis/Data/ohsumed/trec9-test/qrels.ohsu.88-91";
+            //indexPath= "/home/iis/Desktop/Edu/thesis/index/ohsumed/ohsu/index/index.key";
+            indexPath= "/home/iis/Desktop/Edu/thesis/index/ohsumed/ohsu/testIndex/index/index.key";
             queryPath = "/home/iis/Desktop/Edu/thesis/Data/ohsumed/trec9-train/trec9-train_output/stemmed_ohsu_query.txt";
         }
         break;
@@ -179,7 +181,9 @@ void computeRSMethods(Index* ind)
                 //for (double lambda_1 = 0 ; lambda_1<=1 ; lambda_1 += smoothJMInterval1){
                 double lambda_1 = smoothJMInterval1;
                 myMethod->setLambda1(lambda_1);
-                for (double lambda_2 = 0 ; lambda_2<=1 ; lambda_2 += smoothJMInterval2){
+                for (double lambda_2 = 0 ; lambda_2<=1 ; lambda_2 += smoothJMInterval2)
+		{
+			//double lambda_2 =smoothJMInterval2;//FIXME ????????????????????????????????????????????????
                     resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(negmu)+"_lambda1:"+numToStr( lambda_1)+"_lambda2:"+numToStr( lambda_2)+".res";
                     myMethod->setLambda2(lambda_2);
 
