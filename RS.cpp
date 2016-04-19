@@ -58,7 +58,7 @@ string judgmentPath,indexPath,queryPath;
 string resultPath = "";
 //int numberOfProcessedQueries = 0 , numberOfQueries=0;
 
-#define DATASET 1 //0-->infile, 1-->ohsu
+#define DATASET 0 //0-->infile, 1-->ohsu
 
 int main(int argc, char * argv[])
 {
@@ -285,6 +285,7 @@ void computeRSMethods(Index* ind)
 
                                                 for(int i = 0 ; i<docids.size(); i++) //compute for docs which have queryTerm
                                                 {
+                                                    //cout<<"relsize: "<<results.size()<<" i : "<<i<<endl<<endl;
                                                     int docID = docids[i];
                                                     //if (docID != ind->document("afp.com-20040109T173702Z-TX-SGE-UQQ37.xml"))
                                                     //	continue;
@@ -328,7 +329,10 @@ void computeRSMethods(Index* ind)
                                                         results.PushValue(docID , sim);
 
                                                         if(results.size() > 200)
+                                                        {
+                                                            cout<<"BREAKKKKKKKKKK\n";
                                                             break;//user gived up
+                                                        }
 
 
 #if 0//FBMODE
@@ -382,9 +386,9 @@ void computeRSMethods(Index* ind)
                                                 retCounter += results.size();
                                                 relCounter += relDocs.size();
 
-                                                global_all_rels += relCounter;
-                                                global_ret += retCounter;
-                                                global_rel_ret += relRetCounter;
+                                                //global_all_rels += relCounter;
+                                                //global_ret += retCounter;
+                                                //global_rel_ret += relRetCounter;
 
                                                 if(results.size() != 0)
                                                 {
@@ -422,8 +426,9 @@ void computeRSMethods(Index* ind)
                                             out<<"Avg Recall: "<<avgRecall<<endl;
                                             out<<"F-measure: "<<(2*avgPrec*avgRecall)/(avgPrec+avgRecall)<<endl<<endl;
 
-                                            double pp = global_rel_ret/global_ret;
-                                            double dd = global_rel_ret/global_all_rels;
+                                            double pp = relRetCounter/retCounter;
+                                            double dd = relRetCounter/relCounter;
+                                            out<<"rel_ret: "<<relRetCounter<<" ret: "<<retCounter<<" rels: "<<relCounter<<endl;
                                             out<<"old_Avg Precision: "<<pp<<endl;
                                             out<<"old_Avg Recall: "<<dd<<endl;
                                             out<<"old_F-measure: "<<(2*pp*dd)/(pp+dd)<<endl<<endl;
