@@ -95,13 +95,14 @@ int main(int argc, char * argv[])
         if(DATASET == 0)//infile
         {
             judgmentPath = "/home/hossein/Desktop/lemur/DataSets/Infile/Data/qrels_en";
-            indexPath = "/home/hossein/Desktop/lemur/DataSets/Ohsumed/Index/trec9-train/index.key";
-            queryPath = "/home/hossein/Desktop/lemur/DataSets/Infile/Data/five_q_en_titleKeyword_en.stemmed.xml";//????????
+            indexPath = "/home/hossein/Desktop/lemur/DataSets/Infile/Index/en/index.key";
+            queryPath = "/home/hossein/Desktop/lemur/DataSets/Infile/Data/q_en_titleKeyword_en.stemmed.xml";//????????
         }else if(DATASET == 1)//ohsu
         {
             judgmentPath = "/home/hossein/Desktop/lemur/DataSets/Ohsumed/Data/trec9-train/qrels.ohsu.adapt.87";
             indexPath = "/home/hossein/Desktop/lemur/DataSets/Ohsumed/Index/trec9-train/index.key";
             queryPath = "/home/hossein/Desktop/lemur/DataSets/Ohsumed/Data/trec9-train/stemmed_ohsu_query.txt";
+
         }
 
         break;
@@ -158,6 +159,8 @@ void computeRSMethods(Index* ind)
     double start_negMu =startNegMu, end_negMu= endNegMu;
     double start_delta =startDelta, end_delta= endDelta;
 
+
+    double global_rel_ret =0, global_ret = 0, global_all_rels ;
 
 #if !FBMODE && !UPDTHRMODE
     for (double thresh = start_thresh ; thresh<=end_thresh ; thresh += intervalThresholdHM)
@@ -239,9 +242,9 @@ void computeRSMethods(Index* ind)
                                             //    resultPath +="_infile.res";
                                             //else if (DATASET == 1)
                                             //    resultPath +="_ohsu.res";
-                                            //ofstream result(resultPath.c_str());
-                                            //ResultFile resultFile(1);
-                                            //resultFile.openForWrite(result,*ind);
+                                            ofstream result(resultPath.c_str());
+                                            ResultFile resultFile(1);
+                                            resultFile.openForWrite(result,*ind);
 
                                             double relRetCounter = 0 , retCounter = 0 , relCounter = 0;
                                             vector<double> queriesPrecision,queriesRecall;
@@ -304,6 +307,9 @@ void computeRSMethods(Index* ind)
                                                                 relJudgDocs.push_back(docID);
 
                                                                 relSumScores+=sim;
+
+                                                                //global_rel_ret++;
+                                                                //global_ret++;
 
                                                                 break;
                                                             }
@@ -368,10 +374,14 @@ void computeRSMethods(Index* ind)
                                                 }//endfor docs
 
                                                 results.Sort();
-                                                //resultFile.writeResults(q->id() ,&results,results.size());
+                                                resultFile.writeResults(q->id() ,&results,results.size());
                                                 relRetCounter += relJudgDocs.size();
                                                 retCounter += results.size();
                                                 relCounter += relDocs.size();
+
+                                                global_all_rels += relCounter;
+                                                global_ret += retCounter;
+                                                global_rel_ret += relRetCounter;
 
                                                 if(results.size() != 0)
                                                 {
@@ -408,6 +418,13 @@ void computeRSMethods(Index* ind)
                                             out<<"Avg Precision: "<<avgPrec<<endl;
                                             out<<"Avg Recall: "<<avgRecall<<endl;
                                             out<<"F-measure: "<<(2*avgPrec*avgRecall)/(avgPrec+avgRecall)<<endl<<endl;
+
+                                            double pp = global_rel_ret/global_ret;
+                                            double dd = global_rel_ret/global_all_rels;
+                                            out<<"old_Avg Precision: "<<pp<<endl;
+                                            out<<"old_Avg Recall: "<<dd<<endl;
+                                            out<<"old_F-measure: "<<(2*pp*dd)/(pp+dd)<<endl<<endl;
+
 
 
                                             //break;
@@ -564,3 +581,4 @@ void ParseQuery(){
 }
 #endif
 #endif
+
