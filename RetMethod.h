@@ -340,7 +340,7 @@ public:
                 if (DNsize == 0)
                     pml_smoothed = (1.0 - lambda) * (cwdbar_negColl/ind.termCountUnique());
                 else
-               //     pml_smoothed = lambda * (cwdbar/DNsize) + (1.0 - lambda) * (cwdbar_negColl/ind.termCountUnique());
+                    //pml_smoothed = lambda * (cwdbar/DNsize) + (1.0 - lambda) * (cwdbar_negColl/ind.termCountUnique());
 		     pml_smoothed = lambda * (cwdbar/uniqueNonRel.size()) + (1.0 - lambda) * (cwdbar_negColl/ind.termCountUnique());
                 
                 double pwc = (double)qtcf/(double)tc;
