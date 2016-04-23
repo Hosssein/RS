@@ -167,7 +167,7 @@ void computeRSMethods(Index* ind)
     for (double thresh = start_thresh ; thresh<=end_thresh ; thresh += intervalThresholdHM)
     {
         //myMethod->setThreshold(thresh);
-
+	myMethod->setThreshold(init_thr);
         for (double delta = start_delta ; delta<=end_delta ; delta += deltaInterval)
         {
             myMethod->setDelta(delta);
@@ -209,7 +209,7 @@ void computeRSMethods(Index* ind)
                             myMethod->setC1(c1);
                             for(double c2 = 0.1 ; c2 <= 4 ; c2+=0.4)//dec
                             {
-                                //myMethod->setThreshold(-5.0);
+                                myMethod->setThreshold(init_thr);
                                 myMethod->setC2(c2);
 
                                 //for(int numOfShownNonRel =1;numOfShownNonRel< 20;numOfShownNonRel+=2 )
