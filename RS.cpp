@@ -150,7 +150,7 @@ void computeRSMethods(Index* ind)
 #define RETMODE RSMethodHM//LM(0) ,RS(1), NegKLQTE(2),NegKL(3)
 #define NEGMODE negGenModeHM//coll(0) ,NonRel(1)
 #define FBMODE feedbackMode//NoFB(0),NonRel(1),Normal(2),Mixture(3)
-#define UPDTHRMODE 1//updatingThresholdMode//No(0),Linear(1) ,Diff(2)
+#define UPDTHRMODE 0//updatingThresholdMode//No(0),Linear(1) ,Diff(2)
 
     cout<< "RSMethod: "<<RSMethodHM<<" NegGenMode: "<<negGenModeHM<<" feedbackMode: "<<feedbackMode<<" updatingThrMode: "<<updatingThresholdMode<<"\n";
     cout<< "RSMethod: "<<RETMODE<<" NegGenMode: "<<NEGMODE<<" feedbackMode: "<<FBMODE<<" updatingThrMode: "<<UPDTHRMODE<<"\n";
@@ -166,17 +166,17 @@ void computeRSMethods(Index* ind)
 //#if !FBMODE && !UPDTHRMODE
     for (double thresh = start_thresh ; thresh<=end_thresh ; thresh += intervalThresholdHM)
     {
-        //myMethod->setThreshold(thresh);
-        myMethod->setThreshold(init_thr);
+        myMethod->setThreshold(thresh);
+        //myMethod->setThreshold(init_thr);
         for (double delta = start_delta ; delta<=end_delta ; delta += deltaInterval)
         {
             myMethod->setDelta(delta);
             resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(delta)+".res";
-            myMethod->setNegMu(2500);
+            myMethod->setNegMu(3000);
 
-            //for (double negmu = start_negMu ; negmu<=end_negMu ; negmu += NegMuInterval)
+            for (double negmu = start_negMu ; negmu<=end_negMu ; negmu += NegMuInterval)
             {
-                double negmu = 2500;//ind->docLengthAvg();
+                //double negmu = 2500;//ind->docLengthAvg();
                 myMethod->setNegMu(negmu);
                 resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(negmu)+".res";
 

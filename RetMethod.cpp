@@ -511,7 +511,7 @@ float lemur::retrieval::RetMethod::computeProfDocSim(lemur::api::TextQueryRep *t
     delete relDocs;
     // cout<<"neg score:**********:"<<negQueryGenerationScore<<endl;
     //cout<<"pos score:**********:"<<adjustedScore<<endl;
-    return negQueryGenerationScore + adjustedScore;
+    return (negQueryGenerationScore + adjustedScore);
 
 
 }
