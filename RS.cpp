@@ -235,9 +235,9 @@ void computeRSMethods(Index* ind)
                                             //    resultPath +="_infile.res";
                                             //else if (DATASET == 1)
                                             //    resultPath +="_ohsu.res";
-                                            //ofstream result(resultPath.c_str());
-                                            //ResultFile resultFile(1);
-                                            //resultFile.openForWrite(result,*ind);
+                                            ofstream result(resultPath.c_str());
+                                            ResultFile resultFile(1);
+                                            resultFile.openForWrite(result,*ind);
 
                                             double relRetCounter = 0 , retCounter = 0 , relCounter = 0;
                                             vector<double> queriesPrecision,queriesRecall;
@@ -364,7 +364,7 @@ void computeRSMethods(Index* ind)
                                                 }//endfor docs
 
                                                 results.Sort();
-                                                //resultFile.writeResults(q->id() ,&results,results.size());
+                                                resultFile.writeResults(q->id() ,&results,results.size());
                                                 relRetCounter += relJudgDocs.size();
                                                 retCounter += results.size();
                                                 relCounter += relDocs.size();

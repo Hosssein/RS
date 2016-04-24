@@ -20,7 +20,7 @@ void k_fold_cross_validation(int k, int q_num, string filePath){
 	//double thr;
 	string thr;
 
-	string oo = filePath+"_cv";
+	string oo = filePath+"_recall_cv";
 
 	ofstream out(oo.c_str());
 
@@ -129,81 +129,66 @@ void k_fold_cross_validation(int k, int q_num, string filePath){
 	for(int i = 0 ; i<k ; i++){
 		//cout<<i<<" "<<max_f_measure_thr[i]<<" "<<max_f_measure[i]<<endl;
 		for(int j = 0 ; j<fold_size[i];j++){
-			out<<thr_f_measure[max_f_measure_thr[i]][i][j]<<endl;
-			sum +=	thr_f_measure[max_f_measure_thr[i]][i][j];
+			out<<thr_recall[max_f_measure_thr[i]][i][j]<<endl;
+			sum +=	thr_recall[max_f_measure_thr[i]][i][j];
 			num++;
 		}
 	}
-	out<<"f_measure: "<<sum/num<<endl;
-	/*for(map<string, map<int,double> >::iterator it = avg_fold_prec.begin() ; it!=avg_fold_prec.end() ; it++){
-		for(int i = 0 ; i<k ; i++){
-			if(it->second[i] > max_prec[i]){
-				max_prec[i] = it->second[i];
+	out<<"recall: "<<sum/num<<endl;
+	/*for(int i = 0 ; i<k ; i++){
+		//cout<<"<"<<i<<">"<<endl;
+		for(map<string, map<int,double> >::iterator it = avg_fold_prec.begin() ; it!=avg_fold_prec.end() ; it++){
+			double sum = 0, num = 0;
+			for(int j = 0 ; j<k ; j++){
+				if (j==i)
+					continue;
+				sum += it->second[j]* fold_size[j];
+				num += fold_size[j];				
+			}
+			//cout<<sum<<" "<<num<<endl;
+			if (sum/num > max_prec[i]){
+				max_prec[i] = sum/num;
 				max_prec_thr[i] = it->first;
 			}
-		}	
+		}
 	}
-	for(map<string, map<int,double> >::iterator it = avg_fold_recall.begin() ; it!=avg_fold_recall.end() ; it++){
-		for(int i = 0 ; i<k ; i++){
-			if(it->second[i] > max_recall[i]){
-				max_recall[i] = it->second[i];
+	double sum = 0, num = 0;
+	for(int i = 0 ; i<k ; i++){
+		//cout<<i<<" "<<max_prec_thr[i]<<" "<<max_prec[i]<<endl;
+		for(int j = 0 ; j<fold_size[i];j++){
+			out<<thr_prec[max_prec_thr[i]][i][j]<<endl;
+			sum +=	thr_prec[max_prec_thr[i]][i][j];
+			num++;
+		}
+	}
+	out<<"prec: "<<sum/num<<endl;*/
+	/*for(int i = 0 ; i<k ; i++){
+		//cout<<"<"<<i<<">"<<endl;
+		for(map<string, map<int,double> >::iterator it = avg_fold_recall.begin() ; it!=avg_fold_recall.end() ; it++){
+			double sum = 0, num = 0;
+			for(int j = 0 ; j<k ; j++){
+				if (j==i)
+					continue;
+				sum += it->second[j]* fold_size[j];
+				num += fold_size[j];				
+			}
+			//cout<<sum<<" "<<num<<endl;
+			if (sum/num > max_recall[i]){
+				max_recall[i] = sum/num;
 				max_recall_thr[i] = it->first;
 			}
-		}	
+		}
 	}
-	for(map<string, map<int,double> >::iterator it = avg_fold_f_measure.begin() ; it!=avg_fold_f_measure.end() ; it++){
-		for(int i = 0 ; i<k ; i++){
-			if(it->second[i] > max_f_measure[i]){
-				max_f_measure[i] = it->second[i];
-				max_f_measure_thr[i] = it->first;
-			}
-		}	
-	}*/
-	//edit for other than 2 fold!
-	//for(int i = 0 ; i<k ; i++)
-	//	cout<<i<<" "<<max_prec_thr[i]<<endl;
-	//for(int i = 0 ; i<k ; i++){
-	/*double final_prec = (avg_fold_prec[max_prec_thr[1]][0] * fold_size[0]) + (avg_fold_prec[max_prec_thr[0]][1] * fold_size[1]);
-	cout<<fold_size[0]<<" "<<fold_size[1]<<endl;
-	for(int i = 0 ; i<fold_size[0];i++){
-		cout<<thr_prec[max_prec_thr[1]][0][i]<<endl;
+	double sum = 0, num = 0;
+	for(int i = 0 ; i<k ; i++){
+		//cout<<i<<" "<<max_recall_thr[i]<<" "<<max_recall[i]<<endl;
+		for(int j = 0 ; j<fold_size[i];j++){
+			out<<thr_recall[max_recall_thr[i]][i][j]<<endl;
+			sum +=	thr_recall[max_recall_thr[i]][i][j];
+			num++;
+		}
 	}
-	for(int i = 0 ; i<fold_size[1];i++){
-		cout<<thr_prec[max_prec_thr[0]][1][i]<<endl;
-	}
-
-	final_prec /= (double)q_num;
-	cout<<"prec: "<<final_prec<<endl;
-//	cout<<avg_fold_prec[max_prec_thr[1]][0] * fold_prec[0].size() + <<endl;
-//	cout<<avg_fold_prec[max_prec_thr[0]][1]<<endl;
-	//}
-	double final_recall = (avg_fold_recall[max_recall_thr[1]][0] * fold_size[0]) + (avg_fold_recall[max_recall_thr[0]][1] * fold_size[1]);
-	cout<<fold_size[0]<<" "<<fold_size[1]<<endl;
-	for(int i = 0 ; i<fold_size[0];i++){
-		cout<<thr_recall[max_recall_thr[1]][0][i]<<endl;
-	}
-	for(int i = 0 ; i<fold_size[1];i++){
-		cout<<thr_recall[max_recall_thr[0]][1][i]<<endl;
-	}
-
-	final_recall /= (double)q_num;
-	cout<<"recall: "<<final_recall<<endl;*/
-	
-
-
-	//double final_f_measure = (avg_fold_f_measure[max_f_measure_thr[1]][0] * fold_size[0]) + (avg_fold_f_measure[max_f_measure_thr[0]][1] * fold_size[1]);
-	//cout<<fold_size[0]<<" "<<fold_size[1]<<endl;
-
-	//for(int i = 0 ; i<fold_size[0];i++){
-	//	cout<<thr_f_measure[max_f_measure_thr[1]][0][i]<<endl;
-	//}
-	//for(int i = 0 ; i<fold_size[1];i++){
-	//	cout<<thr_f_measure[max_f_measure_thr[0]][1][i]<<endl;
-	//}
-
-	//final_f_measure /= (double)q_num;
-	//cout<<"f_measure: "<<final_f_measure<<endl;
-
+	out<<"recall: "<<sum/num<<endl;*/
 }
 
 
