@@ -167,7 +167,7 @@ void computeRSMethods(Index* ind)
     for (double thresh = start_thresh ; thresh<=end_thresh ; thresh += intervalThresholdHM)
     {
         //myMethod->setThreshold(thresh);
-	myMethod->setThreshold(init_thr);
+        myMethod->setThreshold(init_thr);
         for (double delta = start_delta ; delta<=end_delta ; delta += deltaInterval)
         {
             myMethod->setDelta(delta);
@@ -255,6 +255,7 @@ void computeRSMethods(Index* ind)
                                             vector<double> queriesPrecision,queriesRecall;
                                             while(qs->hasMore())
                                             {
+                                                //myMethod->clearRelNonRelCountFlag();
 #if UPDTHRMODE != 0
                                                 myMethod->setThreshold(init_thr);
 #endif
@@ -273,7 +274,7 @@ void computeRSMethods(Index* ind)
                                                 QueryRep *qr = myMethod->computeQueryRep(*q);
                                                 cout<<"qid: "<<q->id()<<endl;
 
-                                                bool newNonRel = false;
+                                                bool newNonRel = false , newRel = false;
                                                 vector<string> relDocs;
 
                                                 if( queryRelDocsMap.find(q->id()) != queryRelDocsMap.end() )//find it!
@@ -295,7 +296,7 @@ void computeRSMethods(Index* ind)
                                                     //if (docID != ind->document("afp.com-20040109T173702Z-TX-SGE-UQQ37.xml"))
                                                     //	continue;
                                                     //cout<<"docid: "<< ind->document(docID)<<endl;
-                                                    float sim = myMethod->computeProfDocSim(((TextQueryRep *)(qr)) ,docID, relJudgDocs , nonRelJudgDocs , newNonRel);
+                                                    float sim = myMethod->computeProfDocSim(((TextQueryRep *)(qr)) ,docID, relJudgDocs , nonRelJudgDocs , newNonRel,newRel);
 
                                                     //cout<<sim<<endl;
                                                     if(sim >=  myMethod->getThreshold() )
@@ -308,8 +309,12 @@ void computeRSMethods(Index* ind)
                                                         {
                                                             if(relDocs[i] == ind->document(docID) )
                                                             {
+                                                                //myMethod->setFlags(true);
+
                                                                 isRel = true;
                                                                 newNonRel = false;
+                                                                newRel = true;
+
                                                                 relJudgDocs.push_back(docID);
 
                                                                 relSumScores+=sim;
@@ -322,9 +327,12 @@ void computeRSMethods(Index* ind)
                                                         }
                                                         if(!isRel)
                                                         {
+                                                           // myMethod->setFlags(false);
+
                                                             nonRelJudgDocs.push_back(docID);
                                                             //if(nonRelJudgDocs.size()%10 == 1)
                                                             newNonRel = true;
+                                                            newRel = false;
                                                             //else
                                                             //	newNonRel = false;
 
@@ -367,7 +375,8 @@ void computeRSMethods(Index* ind)
                                                     }
                                                     else
                                                     {
-                                                        newNonRel = false;
+                                                        newNonRel = false;//?????????????????
+                                                        newRel = false;//?????????????????
                                                         numberOfNotShownDocs++;
                                                     }
 #if UPDTHRMODE == 1
@@ -460,13 +469,13 @@ void computeRSMethods(Index* ind)
                     }//end alpha for
 #endif
 
-//#if !FBMODE && !UPDTHRMODE
+                    //#if !FBMODE && !UPDTHRMODE
                     // }
                 }
             }
         }
     }
-//#endif
+    //#endif
     delete qs;
     delete myMethod;
 }
