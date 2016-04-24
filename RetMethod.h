@@ -653,12 +653,14 @@ public:
             do {
                 // re-estimate & compute likelihood
                 double ll = 0;
-
+                prev_distQuery.clear();
                 for (i=1; i<=numTerms;i++) {
 
                     distQuery[i] = distQueryEst[i]/distQueryNorm;
-                    prev_distQuery[i] = distQuery[i];
+                    //prev_distQuery[i] = distQuery[i];
                     // cerr << "dist: "<< distQuery[i] << endl;
+                    if(distQuery[i]>0)
+                        prev_distQuery[i] = distQuery[i];
                     distQueryEst[i] =0;
                 }
 
@@ -711,14 +713,16 @@ public:
                                            docParam.DirPrior,
                                            docParam.smthStrategy);
 
-        for (int i=1; i<=numTerms; i++) {
-            if (distQuery[i] > 0) {
+       // for (int i=1; i<=numTerms; i++) {
+         //   if (distQuery[i] > 0) {
+        for(map<int,double>::iterator it = prev_distQuery.begin(); it!= prev_distQuery.end() ; it++){
                 int tf=0 ;
-                hfv.find(i,tf);
-                fang_score+= prev_distQuery[i] * log (distQuery[i]/dm->seenProb(tf, i));
-                //lmCounter.incCount(i, distQuery[i]);
+                hfv.find(it->first,tf);
+                fang_score+= it->second * log (it->second/dm->seenProb(tf, it->first));
             }
-        }
+                //lmCounter.incCount(i, distQuery[i]);
+           // }
+        //}
 
         delete dm;
         //lemur::langmod::MLUnigramLM *fblm = new lemur::langmod::MLUnigramLM(lmCounter, ind.termLexiconID());
@@ -804,7 +808,8 @@ protected:
     double C1,C2;//for linear
     double diffThrUpdatingParam;//for diff
 
-    double *prev_distQuery;
+    //double *prev_distQuery;
+    map <int,double>prev_distQuery;
 
     double NegMu;
     double delta;

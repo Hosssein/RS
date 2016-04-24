@@ -253,14 +253,14 @@ lemur::retrieval::RetMethod::RetMethod(const Index &dbIndex,
     }
     }
 
-    prev_distQuery = new double[ind.termCountUnique()+1];
+    //prev_distQuery = new double[ind.termCountUnique()+1];
     scFunc = new ScoreFunc();
     scFunc->setScoreMethod(qryParam.adjScoreMethod);
 }
 
 lemur::retrieval::RetMethod::~RetMethod() 
 {
-    delete [] prev_distQuery;
+    //delete [] prev_distQuery;
     delete [] docProbMass;
     delete [] uniqueTermCount;
     delete [] mcNorm;
