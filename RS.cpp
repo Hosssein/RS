@@ -150,7 +150,7 @@ void computeRSMethods(Index* ind)
 #define RETMODE RSMethodHM//LM(0) ,RS(1), NegKLQTE(2),NegKL(3)
 #define NEGMODE negGenModeHM//coll(0) ,NonRel(1)
 #define FBMODE feedbackMode//NoFB(0),NonRel(1),Normal(2),Mixture(3)
-#define UPDTHRMODE 0//updatingThresholdMode//No(0),Linear(1) ,Diff(2)
+#define UPDTHRMODE 1//updatingThresholdMode//No(0),Linear(1) ,Diff(2)
 
     cout<< "RSMethod: "<<RSMethodHM<<" NegGenMode: "<<negGenModeHM<<" feedbackMode: "<<feedbackMode<<" updatingThrMode: "<<updatingThresholdMode<<"\n";
     cout<< "RSMethod: "<<RETMODE<<" NegGenMode: "<<NEGMODE<<" feedbackMode: "<<FBMODE<<" updatingThrMode: "<<UPDTHRMODE<<"\n";
@@ -161,13 +161,14 @@ void computeRSMethods(Index* ind)
 
 
     //double global_rel_ret =0, global_ret = 0, global_all_rels ;
-    double init_thr = start_thresh;
+    const double init_thr = start_thresh;
 
 //#if !FBMODE && !UPDTHRMODE
     for (double thresh = start_thresh ; thresh<=end_thresh ; thresh += intervalThresholdHM)
     {
         myMethod->setThreshold(thresh);
-        //myMethod->setThreshold(init_thr);
+        myMethod->setThreshold(init_thr);
+
         for (double delta = start_delta ; delta<=end_delta ; delta += deltaInterval)
         {
             myMethod->setDelta(delta);
@@ -204,23 +205,23 @@ void computeRSMethods(Index* ind)
 
 #if UPDTHRMODE == 1
 
-                        for(double c1 = 0.1 ; c1<=2 ;c1+=0.2)//inc
+                        for(double c1 = 0.0 ; c1<=1.0 ;c1+=0.2)//inc
                         {
                             myMethod->setC1(c1);
-                            for(double c2 = 0.1 ; c2 <= 4 ; c2+=0.4)//dec
+                            for(double c2 = 0.0 ; c2 <= 2.0 ; c2+=0.2)//dec
                             {
-                                myMethod->setThreshold(init_thr);
+                                //myMethod->setThreshold(init_thr);
                                 myMethod->setC2(c2);
 
-                                //for(int numOfShownNonRel =1;numOfShownNonRel< 20;numOfShownNonRel+=2 )
-                                int numOfShownNonRel = 5;
+                                for(int numOfShownNonRel =1;numOfShownNonRel< 10;numOfShownNonRel+=2 )
+                                //int numOfShownNonRel = 5;
                                 {
 
-                                    //for(int numOfnotShownDoc = 20 ;numOfnotShownDoc <= 800 ; numOfnotShownDoc+=20)
+                                    for(int numOfnotShownDoc = 10 ;numOfnotShownDoc <= 100 ; numOfnotShownDoc+=15)
                                     {
-                                        int numOfnotShownDoc = 500;
+                                        //int numOfnotShownDoc = 500;
 
-                                        //myMethod->setThreshold(-5.0);
+                                        myMethod->setThreshold(init_thr);
                                         cout<<"c1: "<<c1<<" c2: "<<c2<<" numOfShownNonRel: "<<numOfShownNonRel<<" numOfnotShownDoc: "<<numOfnotShownDoc<<" "<<endl;
                                         resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_c1:"+numToStr(c1)+"_c2:"+numToStr(c2)+"_#showNonRel:"+numToStr(numOfShownNonRel)+"_#notShownDoc:"+numToStr(numOfnotShownDoc)+".res";
 #endif
@@ -305,9 +306,9 @@ void computeRSMethods(Index* ind)
                                                         numberOfNotShownDocs=0;
 
                                                         bool isRel = false;
-                                                        for(int i = 0 ; i < relDocs.size() ; i++)
+                                                        for(int ii = 0 ; ii < relDocs.size() ; ii++)
                                                         {
-                                                            if(relDocs[i] == ind->document(docID) )
+                                                            if(relDocs[ii] == ind->document(docID) )
                                                             {
                                                                 //myMethod->setFlags(true);
 
