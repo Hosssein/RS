@@ -247,7 +247,8 @@ public:
                 TermInfoList *termList = ind.termInfoList(JudgDocs[JudgDocs.size()-1]);
                 termList->startIteration();
                 TermInfo *tEntry;
-                while (termList->hasMore()) {
+                while (termList->hasMore())
+                {
                     tEntry = termList->nextEntry();
                     uniqueNonRel.insert(tEntry->termID());
                 }

@@ -140,13 +140,6 @@ void computeRSMethods(Index* ind)
     ofstream out(outFilename.c_str());
 
 
-    /*
-#define RETMODE 1//LM(0) ,RS(1)
-    //#define NEGMODE 0//coll(0) ,NonRel(1)
-#define FBMODE 0//NoFB(0),NonRel(1),Normal(2)
-#define UPDTHRMODE 0//No(0),Linear(1) ,Diff(2)
-*/
-
 #define RETMODE RSMethodHM//LM(0) ,RS(1), NegKLQTE(2),NegKL(3)
 #define NEGMODE negGenModeHM//coll(0) ,NonRel(1)
 #define FBMODE feedbackMode//NoFB(0),NonRel(1),Normal(2),Mixture(3)
@@ -208,7 +201,7 @@ void computeRSMethods(Index* ind)
                         for(double c1 = 0.1 ; c1<=1.0 ;c1+=0.2)//inc
                         {
                             myMethod->setC1(c1);
-                            for(double c2 = 0.1 ; c2 <= 1.0 ; c2+=0.2)//dec
+                            for(double c2 = 0.01 ; c2 <= 0.1 ; c2+=0.02)//dec
                             {
                                 //myMethod->setThreshold(init_thr);
                                 myMethod->setC2(c2);
@@ -217,7 +210,7 @@ void computeRSMethods(Index* ind)
                                int numOfShownNonRel = 5;
                                 {
 
-                                    for(int numOfnotShownDoc = 10 ;numOfnotShownDoc <= 100 ; numOfnotShownDoc+=15)
+                                    for(int numOfnotShownDoc = 40 ;numOfnotShownDoc <= 200 ; numOfnotShownDoc+=25)
                                     {
                                         //int numOfnotShownDoc = 500;
 
@@ -243,11 +236,6 @@ void computeRSMethods(Index* ind)
                                             qs->startDocIteration();
                                             TextQuery *q;
 
-
-                                            //if(DATASET == 0)
-                                            //    resultPath +="_infile.res";
-                                            //else if (DATASET == 1)
-                                            //    resultPath +="_ohsu.res";
                                             ofstream result(resultPath.c_str());
                                             ResultFile resultFile(1);
                                             resultFile.openForWrite(result,*ind);
@@ -292,51 +280,31 @@ void computeRSMethods(Index* ind)
 
                                                 for(int i = 0 ; i<docids.size(); i++) //compute for docs which have queryTerm
                                                 {
-                                                    //cout<<"relsize: "<<results.size()<<" i : "<<i<<endl<<endl;
                                                     int docID = docids[i];
-                                                    //if (docID != ind->document("afp.com-20040109T173702Z-TX-SGE-UQQ37.xml"))
-                                                    //	continue;
-                                                    //cout<<"docid: "<< ind->document(docID)<<endl;
-                                                    float sim = myMethod->computeProfDocSim(((TextQueryRep *)(qr)) ,docID, relJudgDocs , nonRelJudgDocs , newNonRel,newRel);
 
-                                                    //cout<<sim<<endl;
+                                                    float sim = myMethod->computeProfDocSim(((TextQueryRep *)(qr)) ,docID, relJudgDocs , nonRelJudgDocs , newNonRel,newRel);
                                                     if(sim >=  myMethod->getThreshold() )
                                                     {
-
                                                         numberOfNotShownDocs=0;
-
                                                         bool isRel = false;
                                                         for(int ii = 0 ; ii < relDocs.size() ; ii++)
                                                         {
                                                             if(relDocs[ii] == ind->document(docID) )
                                                             {
-                                                                //myMethod->setFlags(true);
-
                                                                 isRel = true;
                                                                 newNonRel = false;
                                                                 newRel = true;
-
                                                                 relJudgDocs.push_back(docID);
-
                                                                 relSumScores+=sim;
-
-                                                                //global_rel_ret++;
-                                                                //global_ret++;
 
                                                                 break;
                                                             }
                                                         }
                                                         if(!isRel)
                                                         {
-                                                           // myMethod->setFlags(false);
-
                                                             nonRelJudgDocs.push_back(docID);
-                                                            //if(nonRelJudgDocs.size()%10 == 1)
                                                             newNonRel = true;
-                                                            newRel = false;
-                                                            //else
-                                                            //	newNonRel = false;
-
+                                                            newRel = false;                                                            
                                                             nonRelSumScores+=sim;
                                                             numberOfShownNonRelDocs++;
                                                         }
@@ -345,7 +313,7 @@ void computeRSMethods(Index* ind)
                                                         if(results.size() > 200)
                                                         {
                                                             cout<<"BREAKKKKKKKKKK\n";
-                                                            break;//user gived up
+                                                            break;
                                                         }
 
 
@@ -401,10 +369,6 @@ void computeRSMethods(Index* ind)
                                                 retCounter += results.size();
                                                 relCounter += relDocs.size();
 
-                                                //global_all_rels += relCounter;
-                                                //global_ret += retCounter;
-                                                //global_rel_ret += relRetCounter;
-
                                                 if(results.size() != 0)
                                                 {
                                                     queriesPrecision.push_back((double)relJudgDocs.size() / results.size());
@@ -448,13 +412,6 @@ void computeRSMethods(Index* ind)
                                             out<<"old_Avg Recall: "<<dd<<endl;
                                             out<<"old_F-measure: "<<(2*pp*dd)/(pp+dd)<<endl<<endl;
 
-
-
-                                            //break;
-                                            //if(feedbackMode == 0)//no fb
-                                            //    break;
-                                            //if(numberOfQueries==2)//????????????????????????????????????????????????????????
-                                            //    break;
 
 #if RETMODE == 1 && FBMODE == 1
                                         }
