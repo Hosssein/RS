@@ -73,11 +73,16 @@ void k_fold_cross_validation(int k, int q_num, string filePath){
 		getline(in,temp);
 		getline(in,temp);
 		//
-		//getline(in,temp);
-		//getline(in,temp);
-		//getline(in,temp);
-		//getline(in,temp);
-		//getline(in,temp);
+		getline(in,temp);
+		getline(in,temp);
+		getline(in,temp);
+		getline(in,temp);
+		getline(in,temp);
+		//
+		getline(in,temp);
+		getline(in,temp);
+		getline(in,temp);
+		getline(in,temp);
 		//
 		//getline(in,temp);
 		
@@ -138,12 +143,12 @@ void k_fold_cross_validation(int k, int q_num, string filePath){
 	for(int i = 0 ; i<k ; i++){
 		//cout<<i<<" "<<max_f_measure_thr[i]<<" "<<max_f_measure[i]<<endl;
 		for(int j = 0 ; j<fold_size[i];j++){
-			out<<thr_recall[max_f_measure_thr[i]][i][j]<<endl;
-			sum +=	thr_recall[max_f_measure_thr[i]][i][j];
+			out<<thr_f_measure[max_f_measure_thr[i]][i][j]<<endl;
+			sum +=	thr_f_measure[max_f_measure_thr[i]][i][j];
 			num++;
 		}
 	}
-	out<<"recall: "<<sum/num<<endl;
+	out<<"fmeasure: "<<sum/num<<endl;
 	/*for(int i = 0 ; i<k ; i++){
 		//cout<<"<"<<i<<">"<<endl;
 		for(map<string, map<int,double> >::iterator it = avg_fold_prec.begin() ; it!=avg_fold_prec.end() ; it++){
