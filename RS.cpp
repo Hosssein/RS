@@ -204,10 +204,10 @@ void computeRSMethods(Index* ind)
 
 #if UPDTHRMODE == 1
 
-                        for(double c1 = 0.1 ; c1<=2 ;c1+=0.2)//inc
+                        for(double c1 = 0.1 ; c1<=1 ;c1+=0.2)//inc
                         {
                             myMethod->setC1(c1);
-                            for(double c2 = 0.1 ; c2 <= 4 ; c2+=0.4)//dec
+                            for(double c2 = 0.1 ; c2 <= 1 ; c2+=0.2)//dec
                             {
                                 myMethod->setThreshold(init_thr);
                                 myMethod->setC2(c2);
