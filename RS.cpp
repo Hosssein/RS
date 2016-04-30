@@ -131,7 +131,7 @@ void computeRSMethods(Index* ind)
     string outFilename;
     if(DATASET == 0)
     {
-        outFilename =outputFileNameHM+"_infile";
+        outFilename =outputFileNameHM+"_infile_inittune";
     }
     else if (DATASET == 1)
     {
@@ -139,13 +139,6 @@ void computeRSMethods(Index* ind)
     }
     ofstream out(outFilename.c_str());
 
-
-    /*
-#define RETMODE 1//LM(0) ,RS(1)
-    //#define NEGMODE 0//coll(0) ,NonRel(1)
-#define FBMODE 0//NoFB(0),NonRel(1),Normal(2)
-#define UPDTHRMODE 0//No(0),Linear(1) ,Diff(2)
-*/
 
 #define RETMODE RSMethodHM//LM(0) ,RS(1), NegKLQTE(2),NegKL(3)
 #define NEGMODE negGenModeHM//coll(0) ,NonRel(1)
@@ -161,29 +154,30 @@ void computeRSMethods(Index* ind)
 
 
     //double global_rel_ret =0, global_ret = 0, global_all_rels ;
-    double init_thr = start_thresh;
+    const double init_thr = start_thresh;
 
 //#if !FBMODE && !UPDTHRMODE
     for (double thresh = start_thresh ; thresh<=end_thresh ; thresh += intervalThresholdHM)
     {
-        //myMethod->setThreshold(thresh);
-        myMethod->setThreshold(init_thr);
+        myMethod->setThreshold(thresh);
+        //myMethod->setThreshold(init_thr);
+
         for (double delta = start_delta ; delta<=end_delta ; delta += deltaInterval)
         {
             myMethod->setDelta(delta);
             resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(delta)+".res";
-            myMethod->setNegMu(2500);
+            myMethod->setNegMu(3000);
 
-            //for (double negmu = start_negMu ; negmu<=end_negMu ; negmu += NegMuInterval)
+            for (double negmu = start_negMu ; negmu<=end_negMu ; negmu += NegMuInterval)
             {
-                double negmu = 2500;//ind->docLengthAvg();
+                //double negmu = 2500;//ind->docLengthAvg();
                 myMethod->setNegMu(negmu);
                 resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(negmu)+".res";
 
                 //for (double lambda_1 = 0 ; lambda_1<=1 ; lambda_1 += smoothJMInterval1){
                 double lambda_1 = smoothJMInterval1;
                 myMethod->setLambda1(lambda_1);
-                for (double lambda_2 = 0 ; lambda_2<=1 ; lambda_2 += smoothJMInterval2)
+                for (double lambda_2 = 0.1 ; lambda_2<=1 ; lambda_2 += smoothJMInterval2)
                 {
                     //double lambda_2 =smoothJMInterval2;//FIXME ????????????????????????????????????????????????
                     resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(negmu)+"_lambda1:"+numToStr( lambda_1)+"_lambda2:"+numToStr( lambda_2)+".res";
@@ -204,23 +198,23 @@ void computeRSMethods(Index* ind)
 
 #if UPDTHRMODE == 1
 
-                        for(double c1 = 0.1 ; c1<=1 ;c1+=0.2)//inc
+                        for(double c1 = 0.5 ; c1<=0.5 ;c1+=0.2)//inc
                         {
                             myMethod->setC1(c1);
-                            for(double c2 = 0.1 ; c2 <= 1 ; c2+=0.2)//dec
+                            for(double c2 = 0.05 ; c2 <= 0.05 ; c2+=0.001)//dec
                             {
-                                myMethod->setThreshold(init_thr);
+                                //myMethod->setThreshold(init_thr);
                                 myMethod->setC2(c2);
 
-                                //for(int numOfShownNonRel =1;numOfShownNonRel< 20;numOfShownNonRel+=2 )
-                                int numOfShownNonRel = 5;
+                                //for(int numOfShownNonRel =1;numOfShownNonRel< 10;numOfShownNonRel+=2 )
+                               int numOfShownNonRel = 5;
                                 {
 
-                                    //for(int numOfnotShownDoc = 20 ;numOfnotShownDoc <= 800 ; numOfnotShownDoc+=20)
+                                    //for(int numOfnotShownDoc = 40 ;numOfnotShownDoc <= 250 ; numOfnotShownDoc+=50)
                                     {
                                         int numOfnotShownDoc = 500;
 
-                                        //myMethod->setThreshold(-5.0);
+                                        //myMethod->setThreshold(init_thr);
                                         cout<<"c1: "<<c1<<" c2: "<<c2<<" numOfShownNonRel: "<<numOfShownNonRel<<" numOfnotShownDoc: "<<numOfnotShownDoc<<" "<<endl;
                                         resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_c1:"+numToStr(c1)+"_c2:"+numToStr(c2)+"_#showNonRel:"+numToStr(numOfShownNonRel)+"_#notShownDoc:"+numToStr(numOfnotShownDoc)+".res";
 #endif
@@ -236,17 +230,16 @@ void computeRSMethods(Index* ind)
 
                                             IndexedRealVector results;
 
+#if UPDTHRMODE != 0
+                                            myMethod->setThreshold(thresh);//????????????
+#endif
+
                                             out<<"threshold: "<<myMethod->getThreshold()<< " negmu: "<<myMethod->getNegMu();
                                             out<<" delta: "<<myMethod->getDelta()<<" lambda_1: "<<lambda_1<<" lambda_2: "<<lambda_2<<endl;
 
                                             qs->startDocIteration();
                                             TextQuery *q;
 
-
-                                            //if(DATASET == 0)
-                                            //    resultPath +="_infile.res";
-                                            //else if (DATASET == 1)
-                                            //    resultPath +="_ohsu.res";
                                             ofstream result(resultPath.c_str());
                                             ResultFile resultFile(1);
                                             resultFile.openForWrite(result,*ind);
@@ -257,9 +250,10 @@ void computeRSMethods(Index* ind)
                                             {
                                                 //myMethod->clearRelNonRelCountFlag();
 #if UPDTHRMODE != 0
-                                                myMethod->setThreshold(init_thr);
+                                                myMethod->setThreshold(thresh);
 #endif
 
+                                                myMethod->clearPrevDistQuery();
 
                                                 double relSumScores =0.0,nonRelSumScores = 0.0;
 
@@ -291,51 +285,31 @@ void computeRSMethods(Index* ind)
 
                                                 for(int i = 0 ; i<docids.size(); i++) //compute for docs which have queryTerm
                                                 {
-                                                    //cout<<"relsize: "<<results.size()<<" i : "<<i<<endl<<endl;
                                                     int docID = docids[i];
-                                                    //if (docID != ind->document("afp.com-20040109T173702Z-TX-SGE-UQQ37.xml"))
-                                                    //	continue;
-                                                    //cout<<"docid: "<< ind->document(docID)<<endl;
-                                                    float sim = myMethod->computeProfDocSim(((TextQueryRep *)(qr)) ,docID, relJudgDocs , nonRelJudgDocs , newNonRel,newRel);
 
-                                                    //cout<<sim<<endl;
+                                                    float sim = myMethod->computeProfDocSim(((TextQueryRep *)(qr)) ,docID, relJudgDocs , nonRelJudgDocs , newNonRel,newRel);
                                                     if(sim >=  myMethod->getThreshold() )
                                                     {
-
                                                         numberOfNotShownDocs=0;
-
                                                         bool isRel = false;
-                                                        for(int i = 0 ; i < relDocs.size() ; i++)
+                                                        for(int ii = 0 ; ii < relDocs.size() ; ii++)
                                                         {
-                                                            if(relDocs[i] == ind->document(docID) )
+                                                            if(relDocs[ii] == ind->document(docID) )
                                                             {
-                                                                //myMethod->setFlags(true);
-
                                                                 isRel = true;
                                                                 newNonRel = false;
                                                                 newRel = true;
-
                                                                 relJudgDocs.push_back(docID);
-
                                                                 relSumScores+=sim;
-
-                                                                //global_rel_ret++;
-                                                                //global_ret++;
 
                                                                 break;
                                                             }
                                                         }
                                                         if(!isRel)
                                                         {
-                                                           // myMethod->setFlags(false);
-
                                                             nonRelJudgDocs.push_back(docID);
-                                                            //if(nonRelJudgDocs.size()%10 == 1)
                                                             newNonRel = true;
                                                             newRel = false;
-                                                            //else
-                                                            //	newNonRel = false;
-
                                                             nonRelSumScores+=sim;
                                                             numberOfShownNonRelDocs++;
                                                         }
@@ -344,7 +318,7 @@ void computeRSMethods(Index* ind)
                                                         if(results.size() > 200)
                                                         {
                                                             cout<<"BREAKKKKKKKKKK\n";
-                                                            break;//user gived up
+                                                            break;
                                                         }
 
 
@@ -400,10 +374,6 @@ void computeRSMethods(Index* ind)
                                                 retCounter += results.size();
                                                 relCounter += relDocs.size();
 
-                                                //global_all_rels += relCounter;
-                                                //global_ret += retCounter;
-                                                //global_rel_ret += relRetCounter;
-
                                                 if(results.size() != 0)
                                                 {
                                                     queriesPrecision.push_back((double)relJudgDocs.size() / results.size());
@@ -447,13 +417,6 @@ void computeRSMethods(Index* ind)
                                             out<<"old_Avg Recall: "<<dd<<endl;
                                             out<<"old_F-measure: "<<(2*pp*dd)/(pp+dd)<<endl<<endl;
 
-
-
-                                            //break;
-                                            //if(feedbackMode == 0)//no fb
-                                            //    break;
-                                            //if(numberOfQueries==2)//????????????????????????????????????????????????????????
-                                            //    break;
 
 #if RETMODE == 1 && FBMODE == 1
                                         }

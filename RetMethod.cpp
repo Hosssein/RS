@@ -410,12 +410,12 @@ void lemur::retrieval::RetMethod::updateThreshold(lemur::api::TextQueryRep &orig
         if(mode == 0)//non rel passed
         {
             setThreshold(getThreshold()+getC1());
-            cout<<"mode 0 "<<getThreshold()<<endl;
+            //cout<<"mode 0 "<<getThreshold()<<endl;
         }
         else if(mode == 1)//not showed anything
         {
             setThreshold( getThreshold()- getC2() );
-            cout<<"mode 1 "<<getThreshold()<<endl;
+            //cout<<"mode 1 "<<getThreshold()<<endl;
         }
 
         //threshold = -4.5;
@@ -511,7 +511,7 @@ float lemur::retrieval::RetMethod::computeProfDocSim(lemur::api::TextQueryRep *t
     delete relDocs;
     // cout<<"neg score:**********:"<<negQueryGenerationScore<<endl;
     //cout<<"pos score:**********:"<<adjustedScore<<endl;
-    return negQueryGenerationScore + adjustedScore;
+    return (negQueryGenerationScore + adjustedScore);
 
 
 }

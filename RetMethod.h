@@ -247,7 +247,8 @@ public:
                 TermInfoList *termList = ind.termInfoList(JudgDocs[JudgDocs.size()-1]);
                 termList->startIteration();
                 TermInfo *tEntry;
-                while (termList->hasMore()) {
+                while (termList->hasMore())
+                {
                     tEntry = termList->nextEntry();
                     uniqueNonRel.insert(tEntry->termID());
                 }
@@ -757,6 +758,11 @@ public:
     double getC2(){return C2;}
     void setC2(double val){C2=val;}
 
+    void clearPrevDistQuery()
+    {
+        prev_distQuery.clear();
+    }
+
     //for diff thr updating method
     void setDiffThrUpdatingParam(double alpha){diffThrUpdatingParam=alpha;}
     double getDiffThrUpdatingParam(){return diffThrUpdatingParam;}
@@ -889,3 +895,4 @@ inline  void RetMethod::setQueryModelParam(RetParameter::QueryModelParam &queryM
 }
 
 #endif /* _SIMPLEKLRETMETHOD_HPP */
+
