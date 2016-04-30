@@ -30,7 +30,7 @@ using namespace lemur::api;
 extern double negGenMUHM;
 extern int RSMethodHM;
 
-namespace lemur 
+namespace lemur
 {
 namespace retrieval
 {
@@ -169,7 +169,7 @@ public:
             {
                 lemur::api::QueryTerm *qt = nextTerm();
                 double pwq = qt->weight()/totalCount();
-                
+
                 int freq=0;
                 hfv.find(qt->id(),freq);
                 if(freq>0)
@@ -193,7 +193,7 @@ public:
             double mu= negMu;//ind.docLengthAvg();//negGenMUHM;//2500;
             negQueryGen =0;
             lemur::api::COUNT_T tc = ind.termCount();
-            
+
             lemur::utility::HashFreqVector hfv(ind,dRep->getID()), *hfv2;
             if (newNonRel)
                 hfv2 = new lemur::utility::HashFreqVector(ind,JudgDocs[JudgDocs.size()-1]);
@@ -233,7 +233,7 @@ public:
         }
         else if (whichMethod == 2)//Uniform nonrel
         {
-            
+
             double mu= negMu;
             negQueryGen =0;
 
@@ -258,7 +258,7 @@ public:
             {
                 lemur::api::QueryTerm *qt = nextTerm();
                 double pwq = qt->weight()/totalCount();
-                
+
                 int freq=0;
                 hfv.find(qt->id(),freq);
                 if (newNonRel)
@@ -266,11 +266,11 @@ public:
                     int freq;
                     hfv2->find(qt->id(),freq);
                     countInNonRel[qt->id()] += freq;
-                    
+
                 }
                 if(freq>0  ||  countInNonRel[qt->id()]==0)
                     delta =0.0;
-                
+
                 lemur::api::TERMID_T id = qt->id();
                 lemur::api::COUNT_T qtcf = ind.termCount(id);
 
@@ -282,7 +282,7 @@ public:
             }
             if (newNonRel)
                 delete hfv2;
-            
+
             return negQueryGen;
 
         }
@@ -295,7 +295,7 @@ public:
             double mu= negMu;//ind.docLengthAvg();//negGenMUHM;//2500;
             negQueryGen =0;
             lemur::api::COUNT_T tc = ind.termCount();
-            
+
             lemur::utility::HashFreqVector hfv(ind,dRep->getID()), *hfv2;
             if (newNonRel)
                 hfv2 = new lemur::utility::HashFreqVector(ind,JudgDocs[JudgDocs.size()-1]);
@@ -343,7 +343,7 @@ public:
                 else
                     //pml_smoothed = lambda * (cwdbar/DNsize) + (1.0 - lambda) * (cwdbar_negColl/ind.termCountUnique());
                     pml_smoothed = lambda * (cwdbar/uniqueNonRel.size()) + (1.0 - lambda) * (cwdbar_negColl/ind.termCountUnique());
-                
+
                 double pwc = (double)qtcf/(double)tc;
                 double pwdbar;
                 //pwdbar = ((pml_smoothed*DNsize)/((DNsize+mu)))+((mu*pwc)/(DNsize+mu));
@@ -758,6 +758,11 @@ public:
     double getC2(){return C2;}
     void setC2(double val){C2=val;}
 
+    void clearPrevDistQuery()
+    {
+        prev_distQuery.clear();
+    }
+
     //for diff thr updating method
     void setDiffThrUpdatingParam(double alpha){diffThrUpdatingParam=alpha;}
     double getDiffThrUpdatingParam(){return diffThrUpdatingParam;}
@@ -772,7 +777,7 @@ public:
     double getLambda2(){return lambda_2;}
     void setLambda2(double val){lambda_2=val;}
 
-    
+
     double getDelta(){return delta;}
     void setDelta(double val){delta = val;}
 

@@ -37,7 +37,7 @@ extern int updatingThresholdMode; // 0 ->no updating ,1->linear
 static int qid=1;
 static string RM;
 Index* myIndex = NULL;
-void lemur::retrieval::QueryModel::interpolateWith(const lemur::langmod::UnigramLM &qModel, 
+void lemur::retrieval::QueryModel::interpolateWith(const lemur::langmod::UnigramLM &qModel,
                                                    double origModCoeff,
                                                    int howManyWord,
                                                    double prSumThresh,
@@ -186,7 +186,7 @@ double lemur::retrieval::QueryModel::clarity() const
     return (ln_Pr/log(2.0));
 }
 
-lemur::retrieval::RetMethod::RetMethod(const Index &dbIndex, 
+lemur::retrieval::RetMethod::RetMethod(const Index &dbIndex,
                                        const string &supportFileName,
                                        ScoreAccumulator &accumulator) :
     TextQueryRetMethod(dbIndex, accumulator), supportFile(supportFileName) {
@@ -209,7 +209,7 @@ lemur::retrieval::RetMethod::RetMethod(const Index &dbIndex,
 
 
 
-    
+
     qryParam.fbMethod = RetParameter::MIXTURE;
     RM="MIX";// *** Query Likelihood adjusted score method *** //
     //qryParam.fbCoeff = RetParameter::defaultFBCoeff;
@@ -258,7 +258,7 @@ lemur::retrieval::RetMethod::RetMethod(const Index &dbIndex,
     scFunc->setScoreMethod(qryParam.adjScoreMethod);
 }
 
-lemur::retrieval::RetMethod::~RetMethod() 
+lemur::retrieval::RetMethod::~RetMethod()
 {
     //delete [] prev_distQuery;
     delete [] docProbMass;
@@ -381,7 +381,7 @@ void lemur::retrieval::RetMethod::updateProfile(lemur::api::TextQueryRep &origRe
                                                 vector<int> relJudgDoc ,vector<int> nonRelJudgDoc)
 {
     //cerr<<"hahahaha"<<endl;
-    
+
     IndexedRealVector rel , nonRel;
     for (int i =0 ; i<relJudgDoc.size() ; i++)
     {
@@ -501,7 +501,7 @@ float lemur::retrieval::RetMethod::computeProfDocSim(lemur::api::TextQueryRep *t
                 negQueryGenerationScore = fangScore(*nonRelDocs,docID,newNonRel);
             //    cout<<"inja5"<<endl;
             }*/
-    negQueryGenerationScore -= fangScore(*relDocs,docID,newRel);//considering positive feedback
+    //negQueryGenerationScore -= fangScore(*relDocs,docID,newRel);//considering positive feedback
 
 
     double adjustedScore = scoreFunc()->adjustedScore(sc, textQR, dRep);
@@ -979,7 +979,6 @@ void lemur::retrieval::RetMethod::computeRM4FBModel(QueryModel &origRep,
     cout<<"haha";
     // Write Your own RM4 right here
 }
-
 
 
 
