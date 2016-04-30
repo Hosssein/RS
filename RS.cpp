@@ -131,7 +131,7 @@ void computeRSMethods(Index* ind)
     string outFilename;
     if(DATASET == 0)
     {
-        outFilename =outputFileNameHM+"_infile";
+        outFilename =outputFileNameHM+"_infile_inittune";
     }
     else if (DATASET == 1)
     {
@@ -160,7 +160,7 @@ void computeRSMethods(Index* ind)
     for (double thresh = start_thresh ; thresh<=end_thresh ; thresh += intervalThresholdHM)
     {
         myMethod->setThreshold(thresh);
-        myMethod->setThreshold(init_thr);
+        //myMethod->setThreshold(init_thr);
 
         for (double delta = start_delta ; delta<=end_delta ; delta += deltaInterval)
         {
@@ -177,7 +177,7 @@ void computeRSMethods(Index* ind)
                 //for (double lambda_1 = 0 ; lambda_1<=1 ; lambda_1 += smoothJMInterval1){
                 double lambda_1 = smoothJMInterval1;
                 myMethod->setLambda1(lambda_1);
-                for (double lambda_2 = 0 ; lambda_2<=1 ; lambda_2 += smoothJMInterval2)
+                for (double lambda_2 = 0.1 ; lambda_2<=1 ; lambda_2 += smoothJMInterval2)
                 {
                     //double lambda_2 =smoothJMInterval2;//FIXME ????????????????????????????????????????????????
                     resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(negmu)+"_lambda1:"+numToStr( lambda_1)+"_lambda2:"+numToStr( lambda_2)+".res";
@@ -198,10 +198,10 @@ void computeRSMethods(Index* ind)
 
 #if UPDTHRMODE == 1
 
-                        for(double c1 = 0.1 ; c1<=1.0 ;c1+=0.2)//inc
+                        for(double c1 = 0.5 ; c1<=0.5 ;c1+=0.2)//inc
                         {
                             myMethod->setC1(c1);
-                            for(double c2 = 0.01 ; c2 <= 0.1 ; c2+=0.02)//dec
+                            for(double c2 = 0.05 ; c2 <= 0.05 ; c2+=0.001)//dec
                             {
                                 //myMethod->setThreshold(init_thr);
                                 myMethod->setC2(c2);
@@ -210,11 +210,11 @@ void computeRSMethods(Index* ind)
                                int numOfShownNonRel = 5;
                                 {
 
-                                    for(int numOfnotShownDoc = 40 ;numOfnotShownDoc <= 200 ; numOfnotShownDoc+=25)
+                                    //for(int numOfnotShownDoc = 40 ;numOfnotShownDoc <= 250 ; numOfnotShownDoc+=50)
                                     {
-                                        //int numOfnotShownDoc = 500;
+                                        int numOfnotShownDoc = 500;
 
-                                        myMethod->setThreshold(init_thr);
+                                        //myMethod->setThreshold(init_thr);
                                         cout<<"c1: "<<c1<<" c2: "<<c2<<" numOfShownNonRel: "<<numOfShownNonRel<<" numOfnotShownDoc: "<<numOfnotShownDoc<<" "<<endl;
                                         resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_c1:"+numToStr(c1)+"_c2:"+numToStr(c2)+"_#showNonRel:"+numToStr(numOfShownNonRel)+"_#notShownDoc:"+numToStr(numOfnotShownDoc)+".res";
 #endif
@@ -229,6 +229,10 @@ void computeRSMethods(Index* ind)
 
 
                                             IndexedRealVector results;
+
+#if UPDTHRMODE != 0
+                                            myMethod->setThreshold(thresh);//????????????
+#endif
 
                                             out<<"threshold: "<<myMethod->getThreshold()<< " negmu: "<<myMethod->getNegMu();
                                             out<<" delta: "<<myMethod->getDelta()<<" lambda_1: "<<lambda_1<<" lambda_2: "<<lambda_2<<endl;
@@ -246,9 +250,10 @@ void computeRSMethods(Index* ind)
                                             {
                                                 //myMethod->clearRelNonRelCountFlag();
 #if UPDTHRMODE != 0
-                                                myMethod->setThreshold(init_thr);
+                                                myMethod->setThreshold(thresh);
 #endif
 
+                                                myMethod->clearPrevDistQuery();
 
                                                 double relSumScores =0.0,nonRelSumScores = 0.0;
 
@@ -304,7 +309,7 @@ void computeRSMethods(Index* ind)
                                                         {
                                                             nonRelJudgDocs.push_back(docID);
                                                             newNonRel = true;
-                                                            newRel = false;                                                            
+                                                            newRel = false;
                                                             nonRelSumScores+=sim;
                                                             numberOfShownNonRelDocs++;
                                                         }

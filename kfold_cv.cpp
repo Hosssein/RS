@@ -68,8 +68,9 @@ void k_fold_cross_validation(int k, int q_num, string filePath){
 		}
 		//cout<<"last "<<prec<<" "<<recall<<endl;
 		//cout<<counter<<endl;
-		getline(in,temp);
-		getline(in,temp);
+		string temp2,temp3;
+		getline(in,temp3);
+		getline(in,temp2);
 		getline(in,temp);
 		getline(in,temp);
 		//
@@ -85,7 +86,7 @@ void k_fold_cross_validation(int k, int q_num, string filePath){
 		getline(in,temp);
 		//
 		//getline(in,temp);
-		
+		thr+= temp3+temp2;
 		fold_size[k-1] = fold_prec[k-1].size();
 		for (int i = 0 ; i<k ; i++){
 			avg_fold_prec[thr][i] = compute_avg(fold_prec[i]);
@@ -141,7 +142,7 @@ void k_fold_cross_validation(int k, int q_num, string filePath){
 	}
 	double sum = 0, num = 0;
 	for(int i = 0 ; i<k ; i++){
-		//cout<<i<<" "<<max_f_measure_thr[i]<<" "<<max_f_measure[i]<<endl;
+		cout<<i<<" "<<max_f_measure_thr[i]<<" "<<max_f_measure[i]<<endl;
 		for(int j = 0 ; j<fold_size[i];j++){
 			out<<thr_f_measure[max_f_measure_thr[i]][i][j]<<endl;
 			sum +=	thr_f_measure[max_f_measure_thr[i]][i][j];
