@@ -251,7 +251,7 @@ void computeRSMethods(Index* ind)
                                                 //myMethod->clearRelNonRelCountFlag();
 #if UPDTHRMODE != 0
                                                 myMethod->setThreshold(thresh);
-#endif
+#endif                                  
 
                                                 myMethod->clearPrevDistQuery();
 
@@ -290,6 +290,7 @@ void computeRSMethods(Index* ind)
                                                     float sim = myMethod->computeProfDocSim(((TextQueryRep *)(qr)) ,docID, relJudgDocs , nonRelJudgDocs , newNonRel,newRel);
                                                     if(sim >=  myMethod->getThreshold() )
                                                     {
+                                                        cout<<docID<<" "<<sim<<" "<< myMethod->getThreshold()<<endl;
                                                         numberOfNotShownDocs=0;
                                                         bool isRel = false;
                                                         for(int ii = 0 ; ii < relDocs.size() ; ii++)
@@ -301,7 +302,7 @@ void computeRSMethods(Index* ind)
                                                                 newRel = true;
                                                                 relJudgDocs.push_back(docID);
                                                                 relSumScores+=sim;
-
+                                                                numberOfShownNonRelDocs = 0;
                                                                 break;
                                                             }
                                                         }

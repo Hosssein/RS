@@ -501,7 +501,7 @@ float lemur::retrieval::RetMethod::computeProfDocSim(lemur::api::TextQueryRep *t
                 negQueryGenerationScore = fangScore(*nonRelDocs,docID,newNonRel);
             //    cout<<"inja5"<<endl;
             }*/
-    negQueryGenerationScore -= fangScore(*relDocs,docID,newRel);//considering positive feedback
+    //negQueryGenerationScore -= fangScore(*relDocs,docID,newRel);//considering positive feedback
 
 
     double adjustedScore = scoreFunc()->adjustedScore(sc, textQR, dRep);
