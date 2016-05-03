@@ -895,3 +895,4 @@ inline  void RetMethod::setQueryModelParam(RetParameter::QueryModelParam &queryM
 }
 
 #endif /* _SIMPLEKLRETMETHOD_HPP */
+
