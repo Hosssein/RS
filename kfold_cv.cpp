@@ -20,7 +20,7 @@ void k_fold_cross_validation(int k, int q_num, string filePath){
 	//double thr;
 	string thr;
 
-	string oo = filePath+"_recall_cv";
+	string oo = filePath+"_fmeasure_cv";
 
 	ofstream out(oo.c_str());
 
