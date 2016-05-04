@@ -131,7 +131,7 @@ void computeRSMethods(Index* ind)
     string outFilename;
     if(DATASET == 0)
     {
-        outFilename =outputFileNameHM+"_infile_inittune";
+        outFilename =outputFileNameHM+"_infile_Fang";
     }
     else if (DATASET == 1)
     {
@@ -198,21 +198,24 @@ void computeRSMethods(Index* ind)
 
 #if UPDTHRMODE == 1
 
-                        for(double c1 = 0.1 ; c1<=0.9 ;c1+=0.2)//inc
+                        for(double c1 = 0.1 ; c1<=0.91 ;c1+=0.2)//inc
                         {
                             myMethod->setC1(c1);
-                            for(double c2 = 0.001 ; c2 <= 0.009 ; c2+=0.002)//dec
+                            for(double c2 = 0.001 ; c2 <= 0.0095 ; c2+=0.002)//dec
                             {
                                 //myMethod->setThreshold(init_thr);
                                 myMethod->setC2(c2);
 
-                                //for(int numOfShownNonRel =1;numOfShownNonRel< 10;numOfShownNonRel+=2 )
-                               int numOfShownNonRel = 5;
+                                for(int numOfShownNonRel =2;numOfShownNonRel< 5;numOfShownNonRel+=1 )
+                               //int numOfShownNonRel = 2;
                                 {
 
-                                    //for(int numOfnotShownDoc = 40 ;numOfnotShownDoc <= 250 ; numOfnotShownDoc+=50)
+                                    for(int numOfnotShownDoc = 200 ;numOfnotShownDoc <= 401 ; numOfnotShownDoc+=100)
                                     {
-                                        int numOfnotShownDoc = 500;
+					//if(numOfShownNonRel == 2 && numOfnotShownDoc ==300)
+						//continue;
+
+                                        //int numOfnotShownDoc = 300;
 
                                         //myMethod->setThreshold(init_thr);
                                         cout<<"c1: "<<c1<<" c2: "<<c2<<" numOfShownNonRel: "<<numOfShownNonRel<<" numOfnotShownDoc: "<<numOfnotShownDoc<<" "<<endl;
@@ -302,7 +305,7 @@ void computeRSMethods(Index* ind)
                                                                 newRel = true;
                                                                 relJudgDocs.push_back(docID);
                                                                 relSumScores+=sim;
-                                                                numberOfShownNonRelDocs = 0;
+                                                                //numberOfShownNonRelDocs = 0;
                                                                 break;
                                                             }
                                                         }
@@ -363,6 +366,7 @@ void computeRSMethods(Index* ind)
 #endif
 
 #if UPDTHRMODE == 2
+						cout<<"updthr 2!!!\n";
                                                     if(numberOfNotShownDocs==100)//FIXME!!!!
                                                         myMethod->updateThreshold(*((TextQueryRep *)(qr)), relJudgDocs , nonRelJudgDocs ,1,relSumScores,nonRelSumScores);//dec thr
 #endif
