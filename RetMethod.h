@@ -25,6 +25,8 @@
 #include "DocUnigramCounter.hpp"
 #include "TermInfoList.hpp"
 #include "Parameters.h"
+#include <algorithm>
+
 using namespace lemur::api;
 
 extern double negGenMUHM;
@@ -154,7 +156,7 @@ public:
      * wichMethod: 0 --> baseline collection
      *             1 --> baseline nonRel
     */
-    double negativeQueryGeneration( const lemur::api::DocumentRep *dRep, vector<int> JudgDocs  , int whichMethod , bool newNonRel, double negMu , double delta, double lambda, double lambda_2) const
+    double negativeQueryGeneration( const lemur::api::DocumentRep *dRep, vector<int> JudgDocs,vector<int> relJudgDocs  , int whichMethod , bool newNonRel,bool newRel, double negMu , double delta, double lambda, double lambda_2) const
     {
 
         if(whichMethod == 0)//baseline(collection)
@@ -355,6 +357,93 @@ public:
                 delete hfv2;
             return negQueryGen;
 
+        } else if (whichMethod == 4)
+        {
+
+            double mu= negMu;
+            negQueryGen =0;
+
+            lemur::api::COUNT_T tc = ind.termCount();
+            startIteration();
+            lemur::utility::HashFreqVector hfv(ind,dRep->getID()), * hfv2 ,*hfv3;
+            if (newNonRel)
+            {
+                hfv2 = new lemur::utility::HashFreqVector(ind,JudgDocs[JudgDocs.size()-1]);
+
+                TermInfoList *termList = ind.termInfoList(JudgDocs[JudgDocs.size()-1]);
+                termList->startIteration();
+                TermInfo *tEntry;
+                while (termList->hasMore())
+                {
+                    tEntry = termList->nextEntry();
+                    uniqueNonRel.insert(tEntry->termID());
+                }
+                delete termList;
+                uniqueDiffRelNonRel.clear();
+                set_difference(uniqueNonRel.begin() ,uniqueNonRel.end() ,uniqueRel.begin(),uniqueRel.end() ,inserter(uniqueDiffRelNonRel,uniqueDiffRelNonRel.begin()) );
+            }
+            if(newRel)
+            {
+                hfv3 = new lemur::utility::HashFreqVector(ind,relJudgDocs[relJudgDocs.size()-1]);
+
+                TermInfoList *termList = ind.termInfoList(relJudgDocs[relJudgDocs.size()-1]);
+                termList->startIteration();
+                TermInfo *tEntry;
+                while (termList->hasMore())
+                {
+                    tEntry = termList->nextEntry();
+                    uniqueRel.insert(tEntry->termID());
+                }
+                delete termList;
+
+                uniqueDiffRelNonRel.clear();
+                set_difference(uniqueNonRel.begin() ,uniqueNonRel.end() ,uniqueRel.begin(),uniqueRel.end() ,inserter(uniqueDiffRelNonRel,uniqueDiffRelNonRel.begin()) );
+
+            }
+
+            while (hasMore())
+            {
+                lemur::api::QueryTerm *qt = nextTerm();
+                double pwq = qt->weight()/totalCount();
+
+                int freq=0;
+                hfv.find(qt->id(),freq);
+                if (newNonRel)
+                {
+                    int freq;
+                    hfv2->find(qt->id(),freq);
+                    countInNonRel[qt->id()] += freq;
+
+                }
+
+                if (newRel)
+                {
+                    int freq;
+                    hfv3->find(qt->id(),freq);
+                    countInRel[qt->id()] += freq;
+                }
+
+                if(freq>0  ||  countInNonRel[qt->id()]==0  || countInRel[qt->id()] != 0)
+                    delta =0.0;
+
+                lemur::api::TERMID_T id = qt->id();
+                lemur::api::COUNT_T qtcf = ind.termCount(id);
+
+
+                double pwc = (double)qtcf/(double)tc;
+                double pwdbar = (delta/(delta*uniqueDiffRelNonRel.size()+mu))+((mu*pwc)/(delta*uniqueDiffRelNonRel.size()+mu));
+                negQueryGen+= pwq *log(pwq/pwdbar);
+
+                delete qt;
+            }
+            if (newNonRel)
+                delete hfv2;
+            if(newRel)
+                delete hfv3;
+
+            return negQueryGen;
+
+
         }
     }
 
@@ -487,6 +576,10 @@ protected:
 
     mutable map <int, int> countInNonRel;
     mutable set <int> uniqueNonRel;
+    mutable set <int> uniqueDiffRelNonRel;
+    mutable map <int, int> countInRel;
+    mutable set <int> uniqueRel;
+
     mutable int DNsize ;
 
 
