@@ -131,7 +131,7 @@ void computeRSMethods(Index* ind)
     string outFilename;
     if(DATASET == 0)
     {
-        outFilename =outputFileNameHM+"_infile_Fang";
+        outFilename =outputFileNameHM+"_infile_noFang_ctuning";
     }
     else if (DATASET == 1)
     {
@@ -201,7 +201,7 @@ void computeRSMethods(Index* ind)
                         for(double c1 = 0.1 ; c1<=0.91 ;c1+=0.2)//inc
                         {
                             myMethod->setC1(c1);
-                            for(double c2 = 0.001 ; c2 <= 0.0095 ; c2+=0.002)//dec
+                            for(double c2 = 0.001 ; c2 <= 0.0091 ; c2+=0.002)//dec
                             {
                                 //myMethod->setThreshold(init_thr);
                                 myMethod->setC2(c2);
@@ -212,8 +212,8 @@ void computeRSMethods(Index* ind)
 
                                     for(int numOfnotShownDoc = 200 ;numOfnotShownDoc <= 401 ; numOfnotShownDoc+=100)
                                     {
-					//if(numOfShownNonRel == 2 && numOfnotShownDoc ==300)
-						//continue;
+					if(numOfShownNonRel == 2 && numOfnotShownDoc ==300)
+						continue;
 
                                         //int numOfnotShownDoc = 300;
 

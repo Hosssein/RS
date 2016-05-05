@@ -503,11 +503,11 @@ float lemur::retrieval::RetMethod::computeProfDocSim(lemur::api::TextQueryRep *t
             }*/
 
 	//double fangScoreTmp = fangScore(*relDocs,docID,newRel);//considering positive feedback
-    negQueryGenerationScore -= fangScore(*relDocs,docID,newRel);//considering positive feedback
+    //negQueryGenerationScore -= fangScore(*relDocs,docID,newRel);//considering positive feedback
 
 
     double adjustedScore = scoreFunc()->adjustedScore(sc, textQR, dRep);
-	
+	//cout<<"negqueryScore: "<<negQueryGenerationScore<<endl;
 
 	//cout<<"fangScoreTmp: "<< fangScoreTmp<<" negqueryScore: "<<negQueryGenerationScore<<" adjusted: "<<adjustedScore<<" newRel" <<newRel<<endl;
 	//negQueryGenerationScore -= fangScoreTmp;
