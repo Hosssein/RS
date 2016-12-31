@@ -58,7 +58,7 @@ string judgmentPath,indexPath,queryPath;
 string resultPath = "";
 //int numberOfProcessedQueries = 0 , numberOfQueries=0;
 
-#define DATASET 0 //0-->infile, 1-->ohsu
+#define DATASET 1 //0-->infile, 1-->ohsu
 
 int main(int argc, char * argv[])
 {
@@ -131,7 +131,7 @@ void computeRSMethods(Index* ind)
     string outFilename;
     if(DATASET == 0)
     {
-        outFilename =outputFileNameHM+"_infile_noFang_ctuning";
+        outFilename =outputFileNameHM+"_infile_noFang_ctuning_smooth_lambdatuning";
     }
     else if (DATASET == 1)
     {
@@ -177,7 +177,7 @@ void computeRSMethods(Index* ind)
                 //for (double lambda_1 = 0 ; lambda_1<=1 ; lambda_1 += smoothJMInterval1){
                 double lambda_1 = smoothJMInterval1;
                 myMethod->setLambda1(lambda_1);
-                for (double lambda_2 = 0.1 ; lambda_2<=1 ; lambda_2 += smoothJMInterval2)
+                for (double lambda_2 = 0.01 ; lambda_2<=0.2 ; lambda_2 += smoothJMInterval2)
                 {
                     //double lambda_2 =smoothJMInterval2;//FIXME ????????????????????????????????????????????????
                     resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(negmu)+"_lambda1:"+numToStr( lambda_1)+"_lambda2:"+numToStr( lambda_2)+".res";
@@ -198,7 +198,7 @@ void computeRSMethods(Index* ind)
 
 #if UPDTHRMODE == 1
 
-                        for(double c1 = 0.1 ; c1<=0.91 ;c1+=0.2)//inc
+                        for(double c1 = 0.2 ; c1<=0.51 ;c1+=0.1)//inc
                         {
                             myMethod->setC1(c1);
                             for(double c2 = 0.001 ; c2 <= 0.0091 ; c2+=0.002)//dec
@@ -206,16 +206,16 @@ void computeRSMethods(Index* ind)
                                 //myMethod->setThreshold(init_thr);
                                 myMethod->setC2(c2);
 
-                                for(int numOfShownNonRel =2;numOfShownNonRel< 5;numOfShownNonRel+=1 )
-                               //int numOfShownNonRel = 2;
+                                //for(int numOfShownNonRel =2;numOfShownNonRel< 5;numOfShownNonRel+=1 )
+                               int numOfShownNonRel = 4;
                                 {
 
-                                    for(int numOfnotShownDoc = 200 ;numOfnotShownDoc <= 401 ; numOfnotShownDoc+=100)
+                                    //for(int numOfnotShownDoc = 200 ;numOfnotShownDoc <= 401 ; numOfnotShownDoc+=100)
                                     {
-					if(numOfShownNonRel == 2 && numOfnotShownDoc ==300)
-						continue;
+					//if(numOfShownNonRel == 2 && numOfnotShownDoc ==300)
+					//	continue;
 
-                                        //int numOfnotShownDoc = 300;
+                                        int numOfnotShownDoc = 200;
 
                                         //myMethod->setThreshold(init_thr);
                                         cout<<"c1: "<<c1<<" c2: "<<c2<<" numOfShownNonRel: "<<numOfShownNonRel<<" numOfnotShownDoc: "<<numOfnotShownDoc<<" "<<endl;
