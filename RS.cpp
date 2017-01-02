@@ -58,7 +58,7 @@ string judgmentPath,indexPath,queryPath;
 string resultPath = "";
 //int numberOfProcessedQueries = 0 , numberOfQueries=0;
 
-#define DATASET 1 //0-->infile, 1-->ohsu
+#define DATASET 0 //0-->infile, 1-->ohsu
 
 int main(int argc, char * argv[])
 {
@@ -94,9 +94,9 @@ int main(int argc, char * argv[])
     default:
         if(DATASET == 0)//infile
         {
-            judgmentPath = "/home/hossein/Desktop/lemur/DataSets/Infile/Data/qrels_en";
-            indexPath = "/home/hossein/Desktop/lemur/DataSets/Infile/Index/en/index.key";
-            queryPath = "/home/hossein/Desktop/lemur/DataSets/Infile/Data/q_en_titleKeyword_en.stemmed.xml";//????????
+            judgmentPath = "/home/hossein/Desktop/IIS/Lemur/DataSets/Infile/Data/qrels_en";
+            indexPath = "/home/hossein/Desktop/IIS/Lemur/DataSets/Infile/Index/en_Stemmed_withoutSW/index.key";
+            queryPath = "/home/hossein/Desktop/IIS/Lemur/DataSets/Infile/Data/q_en_titleKeyword_en.stemmed.xml";//????????
         }else if(DATASET == 1)//ohsu
         {
             judgmentPath = "/home/hossein/Desktop/lemur/DataSets/Ohsumed/Data/trec9-train/qrels.ohsu.adapt.87";
@@ -111,7 +111,6 @@ int main(int argc, char * argv[])
     Index *ind = IndexManager::openIndex(indexPath);// Your own path to index
     //cerr<<ind->term("the")<<endl;
     //cerr<<ind->term("doping");
-
     loadJudgment();
     computeRSMethods(ind);
 
@@ -131,7 +130,7 @@ void computeRSMethods(Index* ind)
     string outFilename;
     if(DATASET == 0)
     {
-        outFilename =outputFileNameHM+"_infile_noFang_ctuning_smooth_lambdatuning";
+        outFilename =outputFileNameHM+"_infile_Fang_ctuning_numberTuning";
     }
     else if (DATASET == 1)
     {
@@ -149,41 +148,41 @@ void computeRSMethods(Index* ind)
     cout<< "RSMethod: "<<RETMODE<<" NegGenMode: "<<NEGMODE<<" feedbackMode: "<<FBMODE<<" updatingThrMode: "<<UPDTHRMODE<<"\n";
     cout<<"outfile: "<<outFilename<<endl;
     double start_thresh =startThresholdHM, end_thresh= endThresholdHM;
-    double start_negMu =startNegMu, end_negMu= endNegMu;
-    double start_delta =startDelta, end_delta= endDelta;
+    //double start_negMu =startNegMu, end_negMu= endNegMu;
+    //double start_delta =startDelta, end_delta= endDelta;
 
 
     //double global_rel_ret =0, global_ret = 0, global_all_rels ;
-    const double init_thr = start_thresh;
+    //const double init_thr = start_thresh;
 
-//#if !FBMODE && !UPDTHRMODE
+    //#if !FBMODE && !UPDTHRMODE
     for (double thresh = start_thresh ; thresh<=end_thresh ; thresh += intervalThresholdHM)
     {
         myMethod->setThreshold(thresh);
         //myMethod->setThreshold(init_thr);
 
-        for (double delta = start_delta ; delta<=end_delta ; delta += deltaInterval)
+        //for (double delta = start_delta ; delta<=end_delta ; delta += deltaInterval)
         {
-            myMethod->setDelta(delta);
-            resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(delta)+".res";
-            myMethod->setNegMu(3000);
+            //myMethod->setDelta(delta);
+            //resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(delta)+".res";
+            //myMethod->setNegMu(3000);
 
-            for (double negmu = start_negMu ; negmu<=end_negMu ; negmu += NegMuInterval)
+            //for (double negmu = start_negMu ; negmu<=end_negMu ; negmu += NegMuInterval)
             {
                 //double negmu = 2500;//ind->docLengthAvg();
-                myMethod->setNegMu(negmu);
-                resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(negmu)+".res";
+                //myMethod->setNegMu(negmu);
+                //resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(negmu)+".res";
 
                 //for (double lambda_1 = 0 ; lambda_1<=1 ; lambda_1 += smoothJMInterval1){
-                double lambda_1 = smoothJMInterval1;
-                myMethod->setLambda1(lambda_1);
-                for (double lambda_2 = 0.01 ; lambda_2<=0.2 ; lambda_2 += smoothJMInterval2)
+                //double lambda_1 = smoothJMInterval1;
+                //myMethod->setLambda1(lambda_1);
+                //for (double lambda_2 = 0.01 ; lambda_2<=0.2 ; lambda_2 += smoothJMInterval2)
                 {
                     //double lambda_2 =smoothJMInterval2;//FIXME ????????????????????????????????????????????????
-                    resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(negmu)+"_lambda1:"+numToStr( lambda_1)+"_lambda2:"+numToStr( lambda_2)+".res";
-                    myMethod->setLambda2(lambda_2);
+                    //resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_"+numToStr(negmu)+"_lambda1:"+numToStr( lambda_1)+"_lambda2:"+numToStr( lambda_2)+".res";
+                    //myMethod->setLambda2(lambda_2);
 
-//#endif
+                    //#endif
 
 
 #if RETMODE == 1 && FBMODE == 1
@@ -199,46 +198,40 @@ void computeRSMethods(Index* ind)
 #if UPDTHRMODE == 1
 
                         for(double c1 = 0.2 ; c1<=0.51 ;c1+=0.1)//inc
+                            //double c1 = 0.2;
                         {
                             myMethod->setC1(c1);
-                            for(double c2 = 0.001 ; c2 <= 0.0091 ; c2+=0.002)//dec
+                            for(double c2 = 0.01 ; c2 <= 0.091 ; c2+=0.02)//dec
+                                //double c2 = 0.01;
                             {
                                 //myMethod->setThreshold(init_thr);
                                 myMethod->setC2(c2);
 
-                                //for(int numOfShownNonRel =2;numOfShownNonRel< 5;numOfShownNonRel+=1 )
-                               int numOfShownNonRel = 4;
+                                for(int numOfShownNonRel =2; numOfShownNonRel< 9;numOfShownNonRel+=2 )
+                                    //int numOfShownNonRel = 4;
                                 {
 
-                                    //for(int numOfnotShownDoc = 200 ;numOfnotShownDoc <= 401 ; numOfnotShownDoc+=100)
+                                    for(int numOfnotShownDoc = 100 ;numOfnotShownDoc <= 401 ; numOfnotShownDoc+=100)
                                     {
-					//if(numOfShownNonRel == 2 && numOfnotShownDoc ==300)
-					//	continue;
+                                        //if(numOfShownNonRel == 2 && numOfnotShownDoc ==300)
+                                        //	continue;
 
-                                        int numOfnotShownDoc = 200;
+                                        //int numOfnotShownDoc = 200;
 
                                         //myMethod->setThreshold(init_thr);
                                         cout<<"c1: "<<c1<<" c2: "<<c2<<" numOfShownNonRel: "<<numOfShownNonRel<<" numOfnotShownDoc: "<<numOfnotShownDoc<<" "<<endl;
                                         resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_c1:"+numToStr(c1)+"_c2:"+numToStr(c2)+"_#showNonRel:"+numToStr(numOfShownNonRel)+"_#notShownDoc:"+numToStr(numOfnotShownDoc)+".res";
 #endif
 
-#if UPDTHRMODE == 2
-                                        for(double alph = 0.1 ; alph <= 1.0 ; alph+=0.1)
-                                        {
-                                            myMethod->setDiffThrUpdatingParam(alph);
-                                            out<<"diff_alpha: "<<myMethod->getDiffThrUpdatingParam()<<endl;
-                                            resultPath = resultFileNameHM.c_str() +numToStr( myMethod->getThreshold() )+"_alpha:"+numToStr(alph)+".res";
-#endif
-
-
                                             IndexedRealVector results;
 
 #if UPDTHRMODE != 0
-                                            myMethod->setThreshold(thresh);//????????????
+                                            myMethod->setThreshold(thresh);
 #endif
 
-                                            out<<"threshold: "<<myMethod->getThreshold()<< " negmu: "<<myMethod->getNegMu();
-                                            out<<" delta: "<<myMethod->getDelta()<<" lambda_1: "<<lambda_1<<" lambda_2: "<<lambda_2<<endl;
+                                            out<<"threshold: "<<myMethod->getThreshold()<<endl;
+                                            //out<<"threshold: "<<myMethod->getThreshold()<< " negmu: "<<myMethod->getNegMu();
+                                            //out<<" delta: "<<myMethod->getDelta()<<" lambda_1: "<<lambda_1<<" lambda_2: "<<lambda_2<<endl;
 
                                             qs->startDocIteration();
                                             TextQuery *q;
@@ -321,7 +314,7 @@ void computeRSMethods(Index* ind)
 
                                                         if(results.size() > 200)
                                                         {
-                                                            cout<<"BREAKKKKKKKKKK\n";
+                                                            cout<<"result size > 200 ,BREAKKKKKKKKKK\n";
                                                             break;
                                                         }
 
@@ -366,7 +359,7 @@ void computeRSMethods(Index* ind)
 #endif
 
 #if UPDTHRMODE == 2
-						cout<<"updthr 2!!!\n";
+                                                    cout<<"updthr 2!!!\n";
                                                     if(numberOfNotShownDocs==100)//FIXME!!!!
                                                         myMethod->updateThreshold(*((TextQueryRep *)(qr)), relJudgDocs , nonRelJudgDocs ,1,relSumScores,nonRelSumScores);//dec thr
 #endif

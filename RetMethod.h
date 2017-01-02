@@ -720,8 +720,10 @@ public:
                                  vector<int> relJudglDoc ,vector<int> nonReljudgDoc ,int mode,double relSumScores , double nonRelSumScores);
     virtual float computeProfDocSim(lemur::api::TextQueryRep *origRep,int docID ,vector<int>relDocs ,vector<int>nonRelDocs , bool newNonRel,bool newRel);
 
+
     double fangScore( DocIDSet &fbDocs, int docID, bool newNonRel)
     {
+
 
         COUNT_T numTerms = ind.termCountUnique();
 
@@ -813,6 +815,7 @@ public:
                 int tf=0 ;
                 hfv.find(it->first,tf);
                 fang_score+= it->second * log (it->second/dm->seenProb(tf, it->first));
+
             }
                 //lmCounter.incCount(i, distQuery[i]);
            // }

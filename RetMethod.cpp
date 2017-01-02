@@ -234,7 +234,7 @@ lemur::retrieval::RetMethod::RetMethod(const Index &dbIndex,
     newRelRecieved = false;
     newNonRelRecievedCnt = 0,newRelRecievedCnt =0;
 
-    switch (RSMethodHM)
+    /*switch (RSMethodHM)
     {
     case 0://lm
         // setThreshold(-4.3);
@@ -251,7 +251,7 @@ lemur::retrieval::RetMethod::RetMethod(const Index &dbIndex,
             setThreshold(1.6);
         break;
     }
-    }
+    }*/
 
     //prev_distQuery = new double[ind.termCountUnique()+1];
     scFunc = new ScoreFunc();
@@ -458,12 +458,14 @@ float lemur::retrieval::RetMethod::computeProfDocSim(lemur::api::TextQueryRep *t
     relDocs= new PseudoFBDocs(rel,-1,true);
 
     const QueryModel *qm = dynamic_cast<const QueryModel *>(textQR);
-    //cout<<"positive score"<<endl;
-    double sc = 0;
-    DocumentRep *dRep;
-    HashFreqVector hfv(ind,docID);
 
+
+    DocumentRep *dRep;
     dRep = computeDocRep(docID);
+
+    /*
+    double sc = 0;
+    HashFreqVector hfv(ind,docID);
     textQR->startIteration();
     while (textQR->hasMore())
     {
@@ -485,6 +487,8 @@ float lemur::retrieval::RetMethod::computeProfDocSim(lemur::api::TextQueryRep *t
         delete info;
         delete qTerm;
     }
+    double adjustedScore = scoreFunc()->adjustedScore(sc, textQR, dRep);
+*/
 
     double negQueryGenerationScore=0.0;
     //cout<<"negative score:"<<endl;
@@ -496,31 +500,28 @@ float lemur::retrieval::RetMethod::computeProfDocSim(lemur::api::TextQueryRep *t
     {
         negQueryGenerationScore = qm->negativeKL(dRep ,nonReljudgDoc , newNonRel,NegMu);
     }
-    /*else if (RSMethodHM == 4)//fang
-            {
-                negQueryGenerationScore = fangScore(*nonRelDocs,docID,newNonRel);
-            //    cout<<"inja5"<<endl;
-            }*/
+    else if (RSMethodHM == 4)//fang
+    {
+        //cerr<<nonRel.size()<<"\n";
+        negQueryGenerationScore = fangScore(*nonRelDocs,docID,newNonRel);
+    }
 
-	//double fangScoreTmp = fangScore(*relDocs,docID,newRel);//considering positive feedback
+    //double fangScoreTmp = fangScore(*relDocs,docID,newRel);//considering positive feedback
     //negQueryGenerationScore -= fangScore(*relDocs,docID,newRel);//considering positive feedback
 
+    double scoreDoc = lemur::api::TextQueryRetMethod::scoreDoc(*textQR,docID); // -KL(q,d)
 
-    double adjustedScore = scoreFunc()->adjustedScore(sc, textQR, dRep);
-	//cout<<"negqueryScore: "<<negQueryGenerationScore<<endl;
+    //negQueryGenerationScore -= fangScoreTmp;
 
-	//cout<<"fangScoreTmp: "<< fangScoreTmp<<" negqueryScore: "<<negQueryGenerationScore<<" adjusted: "<<adjustedScore<<" newRel" <<newRel<<endl;
-	//negQueryGenerationScore -= fangScoreTmp;
 
-    //cout <<"inja6"<<endl;
     delete dRep;
     delete nonRelDocs;
     delete relDocs;
-    // cout<<"neg score:**********:"<<negQueryGenerationScore<<endl;
-    //cout<<"pos score:**********:"<<adjustedScore<<endl;
-    return (negQueryGenerationScore + adjustedScore);
 
+    //return (negQueryGenerationScore + adjustedScore);
+    //cerr<<scoreDoc <<" "<<negQueryGenerationScore<<"\n";
 
+    return (-0.8*negQueryGenerationScore + scoreDoc);
 }
 
 
