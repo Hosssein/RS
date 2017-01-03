@@ -521,7 +521,7 @@ float lemur::retrieval::RetMethod::computeProfDocSim(lemur::api::TextQueryRep *t
     //return (negQueryGenerationScore + adjustedScore);
     //cerr<<scoreDoc <<" "<<negQueryGenerationScore<<"\n";
 
-    return (-0.8*negQueryGenerationScore + scoreDoc);
+    return (0.8*negQueryGenerationScore + scoreDoc);
 }
 
 

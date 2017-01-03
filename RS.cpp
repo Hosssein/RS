@@ -29,6 +29,7 @@ void loadJudgment();
 void computeRSMethods(Index *);
 void MonoKLModel(Index* ind);
 vector<int> queryDocList(Index* ind,TextQueryRep *textQR);
+vector<int> relDocList(Index* ind, vector<string> relDocs);
 
 
 template <typename T>
@@ -197,12 +198,12 @@ void computeRSMethods(Index* ind)
 
 #if UPDTHRMODE == 1
 
-                        for(double c1 = 0.2 ; c1<=0.51 ;c1+=0.1)//inc
-                            //double c1 = 0.2;
+                        for(double c1 = 0.1 ; c1<=0.41 ;c1+=0.1)//inc
+                            //double c1 = 0.4;
                         {
                             myMethod->setC1(c1);
                             for(double c2 = 0.01 ; c2 <= 0.091 ; c2+=0.02)//dec
-                                //double c2 = 0.01;
+                                //double c2 = 0.02;
                             {
                                 //myMethod->setThreshold(init_thr);
                                 myMethod->setC2(c2);
@@ -276,7 +277,8 @@ void computeRSMethods(Index* ind)
                                                 }
 
                                                 //for(int docID = 1 ; docID < ind->docCount() ; docID++){ //compute for all doc
-                                                vector <int> docids = queryDocList(ind,((TextQueryRep *)(qr)));
+                                                vector <int> docids =queryDocList(ind,((TextQueryRep *)(qr)));
+                                                //vector <int> docids = relDocList(ind ,relDocs);
 
 
                                                 for(int i = 0 ; i<docids.size(); i++) //compute for docs which have queryTerm
@@ -473,6 +475,15 @@ void loadJudgment()
     /*map<string , vector<string> >::iterator it;
     for(it = queryRelDocsMap.begin();it!= queryRelDocsMap.end() ; ++it)
         cerr<<it->first<<endl;*/
+
+}
+vector<int> relDocList(Index* ind,vector<string> relDocs)
+{
+    vector<int> docids;
+    for(int i = 0; i < relDocs.size(); i++)
+        docids.push_back(ind->document(relDocs[i]) );
+
+    return docids;
 
 }
 vector<int> queryDocList(Index* ind,TextQueryRep *textQR)
