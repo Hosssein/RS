@@ -31,6 +31,8 @@ using namespace lemur::api;
 
 extern double negGenMUHM;
 extern int RSMethodHM;
+extern vector<int> queryTermIndexes;//for fang(QTE)
+
 
 namespace lemur
 {
@@ -809,12 +811,18 @@ public:
                                            docParam.DirPrior,
                                            docParam.smthStrategy);
 
+
+        for(int k = 0 ; k < queryTermIndexes.size() ;k++)
+            prev_distQuery[queryTermIndexes[k]] = 0;
+        //cerr<<queryTermIndexes.size()<<endl;
+
        // for (int i=1; i<=numTerms; i++) {
          //   if (distQuery[i] > 0) {
         for(map<int,double>::iterator it = prev_distQuery.begin(); it!= prev_distQuery.end() ; it++){
                 int tf=0 ;
                 hfv.find(it->first,tf);
-                fang_score+= it->second * log (it->second/dm->seenProb(tf, it->first));
+                if(it->second != 0)
+                    fang_score+= it->second * log (it->second/dm->seenProb(tf, it->first));
 
             }
                 //lmCounter.incCount(i, distQuery[i]);

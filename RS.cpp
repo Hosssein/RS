@@ -31,6 +31,8 @@ void MonoKLModel(Index* ind);
 vector<int> queryDocList(Index* ind,TextQueryRep *textQR);
 vector<int> relDocList(Index* ind, vector<string> relDocs);
 
+void fillQueryTermIndexes(TextQueryRep *textQR);
+
 
 template <typename T>
 string numToStr(T number)
@@ -53,6 +55,8 @@ extern int negGenModeHM;
 extern double smoothJMInterval1,smoothJMInterval2;
 
 extern int updatingThresholdMode;
+
+vector<int> queryTermIndexes;//for fang(QTE)
 
 map<string , vector<string> >queryRelDocsMap;
 string judgmentPath,indexPath,queryPath;
@@ -131,7 +135,7 @@ void computeRSMethods(Index* ind)
     string outFilename;
     if(DATASET == 0)
     {
-        outFilename =outputFileNameHM+"_infile_Fang_0.2_ctuning_numberTuning";
+        outFilename =outputFileNameHM+"_infile_Fang_QTE_0.2_ctuning_numberTuning";
     }
     else if (DATASET == 1)
     {
@@ -252,6 +256,7 @@ void computeRSMethods(Index* ind)
 
                                                 myMethod->clearPrevDistQuery();
 
+
                                                 double relSumScores =0.0,nonRelSumScores = 0.0;
 
                                                 int numberOfNotShownDocs = 0,numberOfShownNonRelDocs = 0;
@@ -267,6 +272,9 @@ void computeRSMethods(Index* ind)
 
                                                 bool newNonRel = false , newRel = false;
                                                 vector<string> relDocs;
+
+                                                fillQueryTermIndexes((TextQueryRep *)(qr));//FANG fang FANG
+
 
                                                 if( queryRelDocsMap.find(q->id()) != queryRelDocsMap.end() )//find it!
                                                     relDocs = queryRelDocsMap[q->id()];
@@ -486,6 +494,21 @@ vector<int> relDocList(Index* ind,vector<string> relDocs)
     return docids;
 
 }
+void fillQueryTermIndexes(TextQueryRep *textQR)
+{
+    textQR->startIteration();
+    while(textQR->hasMore())
+    {
+        QueryTerm *qTerm =textQR->nextTerm();
+        if(qTerm->id()==0)
+        {
+            cerr<<"**********"<<endl;
+            continue;
+        }
+        queryTermIndexes.push_back(qTerm->id());
+    }
+}
+
 vector<int> queryDocList(Index* ind,TextQueryRep *textQR)
 {
     vector<int> docids;
