@@ -131,7 +131,7 @@ void computeRSMethods(Index* ind)
     string outFilename;
     if(DATASET == 0)
     {
-        outFilename =outputFileNameHM+"_infile_Fang_ctuning_numberTuning";
+        outFilename =outputFileNameHM+"_infile_Fang_0.2_ctuning_numberTuning";
     }
     else if (DATASET == 1)
     {
@@ -198,21 +198,21 @@ void computeRSMethods(Index* ind)
 
 #if UPDTHRMODE == 1
 
-                        for(double c1 = 0.1 ; c1<=0.41 ;c1+=0.1)//inc
+                        for(double c1 = 0.1 ; c1<=0.41 ;c1+=0.1)//inc 4
                             //double c1 = 0.4;
                         {
                             myMethod->setC1(c1);
-                            for(double c2 = 0.01 ; c2 <= 0.091 ; c2+=0.02)//dec
+                            for(double c2 = 0.01 ; c2 <= 0.091 ; c2+=0.02)//dec 5
                                 //double c2 = 0.02;
                             {
                                 //myMethod->setThreshold(init_thr);
                                 myMethod->setC2(c2);
 
-                                for(int numOfShownNonRel =2; numOfShownNonRel< 9;numOfShownNonRel+=2 )
+                                for(int numOfShownNonRel =2; numOfShownNonRel< 7;numOfShownNonRel+=2 ) //3
                                     //int numOfShownNonRel = 4;
                                 {
 
-                                    for(int numOfnotShownDoc = 100 ;numOfnotShownDoc <= 401 ; numOfnotShownDoc+=100)
+                                    for(int numOfnotShownDoc = 100 ;numOfnotShownDoc <= 401 ; numOfnotShownDoc+=100)//4
                                     {
                                         //if(numOfShownNonRel == 2 && numOfnotShownDoc ==300)
                                         //	continue;

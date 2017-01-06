@@ -217,7 +217,7 @@ lemur::retrieval::RetMethod::RetMethod(const Index &dbIndex,
     qryParam.fbPrTh = RetParameter::defaultFBPrTh;
     qryParam.fbPrSumTh = RetParameter::defaultFBPrSumTh;
     qryParam.fbTermCount = 5;//RetParameter::defaultFBTermCount;
-    qryParam.fbMixtureNoise = RetParameter::defaultFBMixNoise;
+    qryParam.fbMixtureNoise = 0.8;//RetParameter::defaultFBMixNoise;
     qryParam.emIterations = 50;//RetParameter::defaultEMIterations;
 
     docProbMass = NULL;
@@ -521,7 +521,7 @@ float lemur::retrieval::RetMethod::computeProfDocSim(lemur::api::TextQueryRep *t
     //return (negQueryGenerationScore + adjustedScore);
     //cerr<<scoreDoc <<" "<<negQueryGenerationScore<<"\n";
 
-    return (0.8*negQueryGenerationScore + scoreDoc);
+    return (0.2*negQueryGenerationScore + scoreDoc);
 }
 
 
