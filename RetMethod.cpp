@@ -200,7 +200,7 @@ lemur::retrieval::RetMethod::RetMethod(const Index &dbIndex,
     //docParam.ADDelta = RetParameter::defaultADDelta;
     docParam.JMLambda = RetParameter::defaultJMLambda;
     //docParam.JMLambda = 0.9;
-    docParam.DirPrior = dbIndex.docLengthAvg();//50;//RetParameter::defaultDirPrior;
+    docParam.DirPrior = 1000;//dbIndex.docLengthAvg();//50;//RetParameter::defaultDirPrior;
 
     qryParam.adjScoreMethod = RetParameter::NEGATIVEKLD;
     //qryParam.adjScoreMethod = RetParameter::QUERYLIKELIHOOD;
@@ -217,14 +217,14 @@ lemur::retrieval::RetMethod::RetMethod(const Index &dbIndex,
     qryParam.fbPrTh = RetParameter::defaultFBPrTh;
     qryParam.fbPrSumTh = RetParameter::defaultFBPrSumTh;
     qryParam.fbTermCount = 5;//RetParameter::defaultFBTermCount;
-    qryParam.fbMixtureNoise = 0.8;//RetParameter::defaultFBMixNoise;
-    qryParam.emIterations = 50;//RetParameter::defaultEMIterations;
+    qryParam.fbMixtureNoise = RetParameter::defaultFBMixNoise;
+    qryParam.emIterations = 30;//RetParameter::defaultEMIterations;
 
     docProbMass = NULL;
     uniqueTermCount = NULL;
     mcNorm = NULL;
 
-    NegMu = ind.docLengthAvg();
+    NegMu = 1000;//ind.docLengthAvg();
     collectLMCounter = new lemur::langmod::DocUnigramCounter(ind);
     collectLM = new lemur::langmod::MLUnigramLM(*collectLMCounter, ind.termLexiconID());
 
@@ -401,6 +401,18 @@ void lemur::retrieval::RetMethod::updateProfile(lemur::api::TextQueryRep &origRe
 void lemur::retrieval::RetMethod::updateThreshold(lemur::api::TextQueryRep &origRep,
                                                   vector<int> relJudgDoc ,vector<int> nonReljudgDoc , int mode,double relSumScores ,double nonRelSumScore)
 {
+    //hamishe linear
+    if(mode == 0)//non rel passed
+    {
+        setThreshold(getThreshold()+getC1());
+        //cout<<"mode 0 "<<getThreshold()<<endl;
+    }
+    else //not showed anything
+    {
+        setThreshold( getThreshold()- getC2() );
+        //cout<<"mode 1 "<<getThreshold()<<endl;
+    }
+#if 0
     thresholdUpdatingMethod = updatingThresholdMode;
     //double alpha = 0.3,beta = 0.9;
     if(thresholdUpdatingMethod == 0)//no updating
@@ -437,6 +449,7 @@ void lemur::retrieval::RetMethod::updateThreshold(lemur::api::TextQueryRep &orig
         cout <<"mode "<<mode<<" alpha "<<alpha <<" relSum: "<<(relSumScores/(relSize+1)+0.005)<<" nonRelSum: "<< (nonRelSumScore/(nonRelSize+1)+0.005) <<" val: "<<val<<" log: "<<std::log10( (nonRelSize+1) / (relSize+1) );
         cout<<" thr: "<<getThreshold()<<endl;
     }
+#endif
 
 
 }
@@ -450,12 +463,12 @@ float lemur::retrieval::RetMethod::computeProfDocSim(lemur::api::TextQueryRep *t
         nonRel.PushValue(nonReljudgDoc[i],0);
     }
     PseudoFBDocs  *nonRelDocs;
-    nonRelDocs= new PseudoFBDocs(nonRel,-1,true);
+    nonRelDocs= new PseudoFBDocs(nonRel,nonRel.size(),true);
 
     for(int i =0 ; i< relJudgDoc.size();i++)
         rel.PushValue(relJudgDoc[i],0);
     PseudoFBDocs  *relDocs;
-    relDocs= new PseudoFBDocs(rel,-1,true);
+    relDocs= new PseudoFBDocs(rel,rel.size(),true);
 
     const QueryModel *qm = dynamic_cast<const QueryModel *>(textQR);
 
@@ -521,7 +534,7 @@ float lemur::retrieval::RetMethod::computeProfDocSim(lemur::api::TextQueryRep *t
     //return (negQueryGenerationScore + adjustedScore);
     //cerr<<scoreDoc <<" "<<negQueryGenerationScore<<"\n";
 
-    return (0.2*negQueryGenerationScore + scoreDoc);
+    return (0.1*negQueryGenerationScore + scoreDoc);
 }
 
 

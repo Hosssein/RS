@@ -100,8 +100,10 @@ int main(int argc, char * argv[])
         if(DATASET == 0)//infile
         {
             judgmentPath = "/home/hossein/Desktop/IIS/Lemur/DataSets/Infile/Data/qrels_en";
-            indexPath = "/home/hossein/Desktop/IIS/Lemur/DataSets/Infile/Index/en_Stemmed_withoutSW/index.key";
-            queryPath = "/home/hossein/Desktop/IIS/Lemur/DataSets/Infile/Data/q_en_titleKeyword_en.stemmed.xml";//????????
+            indexPath = "/home/hossein/Desktop/IIS/Lemur/DataSets/Infile/Index/new_en_notStemmed_withoutSW/index.key";
+
+            //queryPath = "/home/hossein/Desktop/IIS/Lemur/DataSets/Infile/Data/q_en_titleKeyword_en.stemmed.xml";//????????
+            queryPath =   "/home/hossein/Desktop/IIS/Lemur/DataSets/Infile/Data/qtest_query.xml";
         }else if(DATASET == 1)//ohsu
         {
             judgmentPath = "/home/hossein/Desktop/lemur/DataSets/Ohsumed/Data/trec9-train/qrels.ohsu.adapt.87";
@@ -135,7 +137,7 @@ void computeRSMethods(Index* ind)
     string outFilename;
     if(DATASET == 0)
     {
-        outFilename =outputFileNameHM+"_infile_Fang_QTE_0.2_ctuning_numberTuning";
+        outFilename =outputFileNameHM+"_infile_Fang_QTE_0.1_ctuning_numberTuning";
     }
     else if (DATASET == 1)
     {
@@ -202,21 +204,21 @@ void computeRSMethods(Index* ind)
 
 #if UPDTHRMODE == 1
 
-                        for(double c1 = 0.1 ; c1<=0.41 ;c1+=0.1)//inc 4
+                        for(double c1 = 0.1; c1<=0.21; c1+=0.05)//inc 3
                             //double c1 = 0.4;
                         {
                             myMethod->setC1(c1);
-                            for(double c2 = 0.01 ; c2 <= 0.091 ; c2+=0.02)//dec 5
+                            for(double c2 = 0.01 ; c2 <= 0.091 ; c2+=0.03)//dec 3
                                 //double c2 = 0.02;
                             {
                                 //myMethod->setThreshold(init_thr);
                                 myMethod->setC2(c2);
 
-                                for(int numOfShownNonRel =2; numOfShownNonRel< 7;numOfShownNonRel+=2 ) //3
+                                for(int numOfShownNonRel =2; numOfShownNonRel< 7;numOfShownNonRel+=3 ) //2
                                     //int numOfShownNonRel = 4;
                                 {
 
-                                    for(int numOfnotShownDoc = 100 ;numOfnotShownDoc <= 401 ; numOfnotShownDoc+=100)//4
+                                    for(int numOfnotShownDoc = 100 ;numOfnotShownDoc <= 401 ; numOfnotShownDoc+=200)//2
                                     {
                                         //if(numOfShownNonRel == 2 && numOfnotShownDoc ==300)
                                         //	continue;
@@ -241,9 +243,9 @@ void computeRSMethods(Index* ind)
                                             qs->startDocIteration();
                                             TextQuery *q;
 
-                                            ofstream result(resultPath.c_str());
-                                            ResultFile resultFile(1);
-                                            resultFile.openForWrite(result,*ind);
+                                            //ofstream result(resultPath.c_str());
+                                            //ResultFile resultFile(1);
+                                            //resultFile.openForWrite(result,*ind);
 
                                             double relRetCounter = 0 , retCounter = 0 , relCounter = 0;
                                             vector<double> queriesPrecision,queriesRecall;
@@ -376,8 +378,8 @@ void computeRSMethods(Index* ind)
 
                                                 }//endfor docs
 
-                                                results.Sort();
-                                                resultFile.writeResults(q->id() ,&results,results.size());
+                                                //results.Sort();
+                                                //resultFile.writeResults(q->id() ,&results,results.size());
                                                 relRetCounter += relJudgDocs.size();
                                                 retCounter += results.size();
                                                 relCounter += relDocs.size();
@@ -467,7 +469,8 @@ void loadJudgment()
             ss >> id >> temp >> docName >> judg;
             if(judg == 1)
             {
-                queryRelDocsMap[id].push_back(docName);
+                //queryRelDocsMap[id].insert(docName.substr(11));//11 harfe aval yesane tuye infile faghat
+                queryRelDocsMap[id].push_back(docName.substr(11));
                 //cerr<<id<<" "<<docName<<endl;
             }
         }else if(DATASET == 1)//ohsu
@@ -506,6 +509,8 @@ void fillQueryTermIndexes(TextQueryRep *textQR)
             continue;
         }
         queryTermIndexes.push_back(qTerm->id());
+
+        delete qTerm;
     }
 }
 
